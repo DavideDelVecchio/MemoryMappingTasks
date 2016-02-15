@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryMappingTasks.CSharp", "MemoryMappingTasks.CSharp.csproj", "{15722729-6EDC-6766-8973-9D4CAD6033A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryMappingTasks.CSharp.Editor", "MemoryMappingTasks.CSharp.Editor.csproj", "{196DCD2F-A4D5-5969-A2B3-56957592E5F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15722729-6EDC-6766-8973-9D4CAD6033A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15722729-6EDC-6766-8973-9D4CAD6033A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15722729-6EDC-6766-8973-9D4CAD6033A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15722729-6EDC-6766-8973-9D4CAD6033A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{196DCD2F-A4D5-5969-A2B3-56957592E5F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{196DCD2F-A4D5-5969-A2B3-56957592E5F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{196DCD2F-A4D5-5969-A2B3-56957592E5F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{196DCD2F-A4D5-5969-A2B3-56957592E5F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
