@@ -12,7 +12,113 @@ public class UsefulFunctions : MonoBehaviour {
     public static List<int> levels = new List<int> {1,2,3}; //up to 5 if we add two more levels
     public static int tot_trials = 90;
     public static int current_level,current_trial,tot_env1, tot_env2, tot_env3, nobj1, nobj2, nobj3, old_env = 0;
+    public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
+    public static CompletePath.PathMapping objPath;// = new PlayerInfo.PathMapping();
 
+
+    //If Oculus is toggled activates the right player prefab
+    public static void ActivatePlayerPrefab()
+    {
+        if (PlayerPrefs.GetInt("Oculus") == 0)
+        {
+            //Activate First Person player, the trial is without Oculus
+            if (GameObject.FindGameObjectWithTag("Player") != null) {
+                if (!GameObject.FindGameObjectWithTag("Player").activeSelf)
+                {
+                    GameObject.FindGameObjectWithTag("Player").SetActive(true);
+                }
+            }
+
+            if (GameObject.FindGameObjectWithTag("OculusPlayer") != null)
+            {
+                if (GameObject.FindGameObjectWithTag("OculusPlayer").activeSelf)
+                {
+                    GameObject.FindGameObjectWithTag("OculusPlayer").SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            //Activate OVR player, the trial is with Oculus
+            if (GameObject.FindGameObjectWithTag("Player") != null)
+            {
+                if (GameObject.FindGameObjectWithTag("Player").activeSelf)
+                {
+                    GameObject.FindGameObjectWithTag("Player").SetActive(false);
+                }
+            }
+
+            if (GameObject.FindGameObjectWithTag("OculusPlayer") != null)
+            {
+                if (!GameObject.FindGameObjectWithTag("OculusPlayer").activeSelf)
+                {
+                    GameObject.FindGameObjectWithTag("OculusPlayer").SetActive(true);
+                }
+            }
+        }
+    }
+
+    //Main Trial information saving
+    public static void MainInfoSaving(GameObject obj)
+    {
+        if ((obj.tag == "Player" && GemsCollection.collision_t == 0) || (obj.tag == "OculusPlayer" && GemsCollection.collision_t == 0))
+        {
+            info = new MainTrialInfo.InfoTrial();
+            info.ID = "Start Position Player";
+            info.s_x = obj.transform.position.x;
+            info.s_y = obj.transform.position.y;
+            info.s_z = obj.transform.position.z;
+            info.time = GemsCollection.trial_t;
+            GemsCollection.trialInfo.Add(info);
+            info = new MainTrialInfo.InfoTrial();
+            info.s_x = GameObject.FindGameObjectWithTag("Treasure").transform.position.x;
+            info.s_y = GameObject.FindGameObjectWithTag("Treasure").transform.position.y;
+            info.s_z = GameObject.FindGameObjectWithTag("Treasure").transform.position.z;
+            info.time = GemsCollection.trial_t;
+            GemsCollection.trialInfo.Add(info);
+
+        }
+        else if (obj.tag == "Gems")
+        {
+            info = new MainTrialInfo.InfoTrial();
+            info.ID = "Gem";
+            info.s_x = obj.transform.position.x;
+            info.s_y = obj.transform.position.y;
+            info.s_z = obj.transform.position.z;
+            info.time = GemsCollection.trial_t;
+            GemsCollection.trialInfo.Add(info);
+        }
+        else
+        {
+            info = new MainTrialInfo.InfoTrial();
+            info.ID = "End Trial Position";
+            info.s_x = obj.transform.position.x;
+            info.s_y = obj.transform.position.y;
+            info.s_z = obj.transform.position.z;
+            info.time = GemsCollection.trial_t;
+            GemsCollection.trialInfo.Add(info);
+        }
+    }
+
+    //Save overall path player
+    public static void PathTracing(GameObject obj)
+    {
+        Vector3 current_position = obj.transform.position;
+        Vector3 current_rotation = obj.transform.rotation.eulerAngles;
+        objPath = new CompletePath.PathMapping();
+        int k = GemsCollection.trialPath.Count;
+        if (k == 0 || GemsCollection.trialPath[k - 1].s_x != current_position.x && GemsCollection.trialPath[k - 1].s_z != current_position.z)
+        {
+            objPath.s_x = current_position.x;
+            objPath.s_y = current_position.y;
+            objPath.s_z = current_position.z;
+            objPath.r_x = current_rotation.x;
+            objPath.r_y = current_rotation.y;
+            objPath.r_z = current_rotation.z;
+            objPath.t = GemsCollection.trial_t;
+            GemsCollection.trialPath.Add(objPath);
+        }
+    }
 
     //Finds environmental items in the scene
     public static void EnvironmentalClues()
@@ -110,14 +216,22 @@ public class UsefulFunctions : MonoBehaviour {
             
             //If the obj is the player we need to add the gem position
             //in constrast if obj is the gem we need to add player position
-            if (obj.tag == "Player")
+            if (obj.tag == "Player" || obj.tag == "OculusPlayer")
             {
                 Vector3 oldTreasurePosition = treasure.transform.position;
                 envItems.Add(GemsCollection.collectObj.transform.position);
             }
             else
             {
-                envItems.Add(GameObject.FindGameObjectWithTag("Player").transform.position);
+                if (obj.tag == "Player")
+                {
+                    envItems.Add(GameObject.FindGameObjectWithTag("Player").transform.position);
+                }
+                else
+                {
+                    envItems.Add(GameObject.FindGameObjectWithTag("OculusPlayer").transform.position);
+                }
+                
             }
 
             //Checks if the position is free
@@ -125,7 +239,7 @@ public class UsefulFunctions : MonoBehaviour {
             if ((totems == null && islandItems == null && palms == null && woods == null) || (!envItems.Contains(newPositionP)))
             {
                 obj.transform.position = newPositionP;
-                if(obj.tag == "Player")
+                if(obj.tag == "Player" || obj.tag == "OculusPlayer")
                 {
                     Vector3 newPositionT = new Vector3(newPositionP.x + distancePT.x, 0, newPositionP.z + distancePT.z);
                     treasure.transform.position = newPositionT;
@@ -178,68 +292,178 @@ public class UsefulFunctions : MonoBehaviour {
         return gems[i];
     }
 
+    //Randomize the environment
     public static int RndEnvironment()
     {
-        if(levels.Count != 0)
+        if (levels.Count != 0)
         {
-            int l = Random.Range(0, levels.Count);//to 4 if we consider 2 more environments
+            int l = Random.Range(0, levels.Count); //to 4 if we consider 2 more environments
             switch (l)
             {
-                //Level 1: Distal cues only
                 case 0:
-                    //Application.LoadLevel(2);
-                    tot_env1 = 1;
-                    current_level = 1;
+                    //Level 1: Distal cues only
+                    if (tot_env1 != 30)
+                    {
+                        Application.LoadLevel(1);
+                        break;
+                    }
+                    else if (tot_trials == 90)
+                    {
+                        Application.LoadLevel(4); //End scene
+                    }
                     break;
-                //Level 2: Distal cues & Boundaries
                 case 1:
-                    tot_env2 = 1;
-                    current_level = 2;
+                    //Level 2: Distal cues & Boundaries
+                    if (tot_env2 != 30)
+                    {
+                        Application.LoadLevel(2);
+                        break;
+                    }
+                    else if (tot_trials == 90)
+                    {
+                        Application.LoadLevel(4); //End scene
+                    }
                     break;
-                //Level 3: Distal cues & Local Landmarks
                 case 2:
-                    tot_env3 = 1;
-                    current_level = 3;
+                    //Level 3: Distal cues & Local Landmarks
+                    if (tot_env3 != 30)
+                    {
+                        Application.LoadLevel(3);
+                        break;
+                    }
+                    else if (tot_trials == 90)
+                    {
+                        Application.LoadLevel(4); //End scene
+                    }
                     break;
-                /*
-                //Level 4: Distal cues + Local Landmarks + Boundaries
-                case 3:
-                    current_level = 4;
-                    break;
-                //Level 5: Empty
-                case 4:
-                    current_level = 5;
-                    break;
-                */
             }
-            levels.RemoveAt(l);
-            return l;
+            return l+1;
         }
-        else
-        {
-            return 0;
+        else {
+            if (tot_trials == 90)
+            {
+                Application.LoadLevel(4); //End scene
+            }
+            return 4;
         }
     }
 
-
-    public static void RndObjNum()
+    //Checks if the block is concluded
+    public static int CheckEnvState(int e)
     {
-        switch (current_level)
+        int isEnvReachedLimit = 2; //0 when is not, 1 when it has reached 30 trials
+        switch (e)
         {
+            case 0:
+                if (tot_env1 == 30)
+                {
+                    levels.Remove(1);
+                    //Reset to zero obj counters
+                    nobj1 = 0;
+                    nobj2 = 0;
+                    nobj3 = 0;
+                    isEnvReachedLimit = 1;
+                    break;
+                }
+                else {
+                    tot_env1++;
+                    isEnvReachedLimit = 0;
+                    GemsCollection.currentEnv = 0;
+                }
+                break;
             case 1:
+                if (tot_env2 == 30)
+                {
+                    levels.Remove(2);
+                    //Reset to zero obj counters
+                    nobj1 = 0;
+                    nobj2 = 0;
+                    nobj3 = 0;
+                    isEnvReachedLimit = 1;
+                    break;
+                }
+                else
+                {
+                    tot_env2++;
+                    isEnvReachedLimit = 0;
+                }
                 break;
             case 2:
+                if (tot_env3 == 30)
+                {
+                    levels.Remove(3);
+                    //Reset to zero obj counters
+                    nobj1 = 0;
+                    nobj2 = 0;
+                    nobj3 = 0;
+                    isEnvReachedLimit = 1;
+                    break;
+                }
+                else
+                {
+                    tot_env3++;
+                    isEnvReachedLimit = 0;
+                }
                 break;
-            case 3:
-                break;
-            /*
-            case 4:
-                break;
-            case 5:
-                break;
-            */
         }
-        
+        return isEnvReachedLimit;
+    }
+
+    //Randomize the number of obj to be collected
+    public static int RndObjNumber()
+    {
+        bool isLimitReached = true;
+        int o = 0;
+        while (isLimitReached)
+        {
+            o = Random.Range(1, 3); //min and max of collectable obj in the scene during trial
+            switch (o)
+            {
+                case 1:
+                    if (nobj1 < 10)
+                    {
+                        nobj1++;
+                        isLimitReached = false;
+                        break;
+                    }
+                    break;
+                case 2:
+                    if (nobj2 < 10)
+                    {
+                        nobj2++;
+                        isLimitReached = false;
+                        break;
+                    }
+                    break;
+                case 3:
+                    if (nobj3 < 10)
+                    {
+                        nobj3++;
+                        isLimitReached = false;
+                        break;
+                    }
+                    break;
+            }
+        }
+        return o; 
+    }
+
+    //Checks if a button is pressed
+    public static bool OnButtonPression()
+    {
+        bool check = false;
+        if ((GameObject.FindGameObjectWithTag("Player") != null) || (GameObject.FindGameObjectsWithTag("OculusPlayer") != null))
+        {
+            if (Input.GetButton("A") || Input.GetButton("OtherX"))
+            {
+                check = true;
+            }
+        }
+        else {
+            check = false;
+        }
+
+        return check;
     }
 
     public static void Feedback()

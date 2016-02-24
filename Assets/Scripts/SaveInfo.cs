@@ -3,10 +3,9 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class SaveInfo : MonoBehaviour {
-    public GameObject sbj, objs,save;
-    public Dropdown env;
-    public Toggle typePath, typeMap, oculus;
-    public InputField sbjname, objsnum;
+    public GameObject sbj,save;
+    public Toggle oculus;
+    public InputField sbjname;
     public int level = 0;
 
     //Levels:
@@ -20,36 +19,24 @@ public class SaveInfo : MonoBehaviour {
 
     void Update()
     {
-        if(sbjname.text != null && (typePath.isOn == true || typeMap.isOn == true))
+        if(sbjname.text != null)
         {
             save.GetComponent<Button>().interactable = true;
         }
-
     }
 
 
     public void OnClick() {
         PlayerPrefs.SetString("SubjID", sbjname.text);
-        PlayerPrefs.SetInt("ObjNum", int.Parse(objsnum.text));
-        switch (env.value)
+        if (oculus.isOn)
         {
-            //Level 1: Distal cues only
-            case 0:
-                //Application.LoadLevel(2);
-                break;
-            //Level 2: Distal cues & Boundaries
-            case 1:
-                break;
-            //Level 3: Distal cues & Local Landmarks
-            case 2:
-                break;
-            //Level 4: Distal cues + Local Landmarks + Boundaries
-            case 3:
-                break;
-            //Level 5: Empty
-            case 4:
-                break;
-        }         
+            PlayerPrefs.SetInt("Oculus", 1); //Exp with Oculus
+        }
+        else {
+            PlayerPrefs.SetInt("Oculus", 0); //Exp without Oculus
+        }
+        //Choose randomly which enviroment to show as first block
+        PlayerPrefs.SetInt("CurrentEnv", UsefulFunctions.RndEnvironment());
     }
 
     public void onCancelClick()

@@ -192,6 +192,30 @@
     <None Include="Assets\OVR\Moonlight\Resources\Unlit Transparent Color.shader" />
     <None Include="Assets\OVR\Moonlight\Shaders\OVRColorRampAlpha.shader" />
     <None Include="Assets\OVR\Moonlight\Shaders\Unlit Crosshair.shader" />
+    <None Include="Assets\SubTrialInfo\lolololo_CompleteTrialPath1.xml" />
+    <None Include="Assets\SubTrialInfo\lolololo_MainTrialInfo1.xml" />
+    <None Include="Assets\SubTrialInfo\popp_CompleteTrialPath1.xml" />
+    <None Include="Assets\SubTrialInfo\popp_MainTrialInfo1.xml" />
+    <None Include="Assets\SubTrialInfo\qwerty_CompleteTrialPath1.xml" />
+    <None Include="Assets\SubTrialInfo\qwerty_MainTrialInfo1.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_CompleteTrialPath1.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_CompleteTrialPath2.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_CompleteTrialPath3.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_CompleteTrialPath4.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_CompleteTrialPath5.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_CompleteTrialPath6.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_CompleteTrialPath7.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_MainTrialInfo1.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_MainTrialInfo2.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_MainTrialInfo3.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_MainTrialInfo4.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_MainTrialInfo5.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_MainTrialInfo6.xml" />
+    <None Include="Assets\SubTrialInfo\qwertyuiop_MainTrialInfo7.xml" />
+    <None Include="Assets\SubTrialInfo\qwqweppp_CompleteTrialPath1.xml" />
+    <None Include="Assets\SubTrialInfo\qwqweppp_MainTrialInfo1.xml" />
+    <None Include="Assets\SubTrialInfo\wwwwww_CompleteTrialPath1.xml" />
+    <None Include="Assets\SubTrialInfo\wwwwww_MainTrialInfo1.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
