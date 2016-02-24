@@ -52,17 +52,11 @@
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Advertisements">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Advertisements.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Analytics">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
@@ -88,6 +82,8 @@
     <Compile Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\SepiaToneEffect.cs" />
     <Compile Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\TwirlEffect.cs" />
     <Compile Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\VortexEffect.cs" />
+    <Compile Include="Assets\Model3D\Targets\Gems\GemExample\Scripts\DemoTimeOfDay.cs" />
+    <Compile Include="Assets\Model3D\Targets\Gems\GemExample\Scripts\Orbit.cs" />
     <Compile Include="Assets\OVR\Moonlight\Scripts\OVRDebugHeadController.cs" />
     <Compile Include="Assets\OVR\Moonlight\Scripts\OVROverlay.cs" />
     <Compile Include="Assets\OVR\Moonlight\Scripts\OVRPlatformMenu.cs" />
@@ -116,6 +112,11 @@
     <Compile Include="Assets\OVR\Scripts\Util\OVRSceneSampleController.cs" />
     <Compile Include="Assets\OVR\Scripts\Util\OVRScreenFade.cs" />
     <Compile Include="Assets\OVR\Scripts\Util\OVRTrackerBounds.cs" />
+    <Compile Include="Assets\Scripts\CompletePath.cs" />
+    <Compile Include="Assets\Scripts\GemsCollection.cs" />
+    <Compile Include="Assets\Scripts\MainTrialInfo.cs" />
+    <Compile Include="Assets\Scripts\SaveInfo.cs" />
+    <Compile Include="Assets\Scripts\UsefulFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\BlendModesOverlay.shader" />
@@ -187,6 +188,7 @@
     <None Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\SeparableWeightedBlurDof34.shader" />
     <None Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\TiltShiftHdrLensBlur.shader" />
     <None Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\frag_ao.cginc" />
+    <None Include="Assets\Model3D\Targets\Gems\Gem\Shaders\Gem.shader" />
     <None Include="Assets\OVR\Moonlight\Resources\Unlit Transparent Color.shader" />
     <None Include="Assets\OVR\Moonlight\Shaders\OVRColorRampAlpha.shader" />
     <None Include="Assets\OVR\Moonlight\Shaders\Unlit Crosshair.shader" />
