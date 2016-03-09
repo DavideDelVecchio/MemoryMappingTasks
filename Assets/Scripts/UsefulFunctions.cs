@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Text;
 using System.Linq;
+using System.Collections;
 
 public class UsefulFunctions : MonoBehaviour {
     public static GameObject[] gems,totems,invisibleBorders,islandItems,palms,woods,waves;
@@ -295,6 +296,9 @@ public class UsefulFunctions : MonoBehaviour {
     //Randomize the environment
     public static int RndEnvironment()
     {
+        Application.LoadLevel(2);
+        return 2;
+        /*
         if (levels.Count != 0)
         {
             int l = Random.Range(0, levels.Count); //to 4 if we consider 2 more environments
@@ -346,6 +350,7 @@ public class UsefulFunctions : MonoBehaviour {
             }
             return 4;
         }
+        */
     }
 
     //Checks if the block is concluded

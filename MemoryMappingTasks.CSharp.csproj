@@ -115,6 +115,7 @@
     <Compile Include="Assets\Scripts\CompletePath.cs" />
     <Compile Include="Assets\Scripts\GemsCollection.cs" />
     <Compile Include="Assets\Scripts\MainTrialInfo.cs" />
+    <Compile Include="Assets\Scripts\MenuStart.cs" />
     <Compile Include="Assets\Scripts\SaveInfo.cs" />
     <Compile Include="Assets\Scripts\UsefulFunctions.cs" />
   </ItemGroup>

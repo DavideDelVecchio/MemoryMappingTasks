@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class GemsCollection : MonoBehaviour {
 
-    public GameObject player, treasure,feedbackCamera;
+    public GameObject player, treasure,feedbackCamera,start_menu,pause_menu;
     public static GameObject collectObj;
     public static int currentEnv;
     int menu_score,score = 0;
@@ -19,12 +19,6 @@ public class GemsCollection : MonoBehaviour {
     public static List<MainTrialInfo.InfoTrial> trialInfo = new List<MainTrialInfo.InfoTrial>();
     public static List<CompletePath.PathMapping> trialPath = new List<CompletePath.PathMapping>();
     public Text score_gained, total_score;
-    /*
-    public Text countdown;
-    int togo;
-    Color transparentColor = Color.clear;
-    Color opaqueColor = Color.black;
-    */
 
 
     // Use this for initialization
@@ -39,6 +33,7 @@ public class GemsCollection : MonoBehaviour {
             if (UsefulFunctions.current_trial == 1)
             {
                 currentEnv = PlayerPrefs.GetInt("CurrentEnv");
+                //start_menu.SetActive(true);
             }
             else if (UsefulFunctions.current_trial > 1)
             {
@@ -160,6 +155,4 @@ public class GemsCollection : MonoBehaviour {
         trialPath.Clear();
         Debug.Log("Variables reinitialized.");
     }
-
-
 }
