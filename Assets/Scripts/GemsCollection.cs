@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class GemsCollection : MonoBehaviour {
 
-    public GameObject player, treasure,feedbackCamera,start_menu,pause_menu;
+    public GameObject player, treasure,start_menu,pause_menu;
     public static GameObject collectObj;
     public static int currentEnv;
     int menu_score,score = 0;
@@ -18,7 +18,7 @@ public class GemsCollection : MonoBehaviour {
     string _FileLocation, _data, subName;
     public static List<MainTrialInfo.InfoTrial> trialInfo = new List<MainTrialInfo.InfoTrial>();
     public static List<CompletePath.PathMapping> trialPath = new List<CompletePath.PathMapping>();
-    public Text score_gained, total_score;
+    public Text score_gained, gems_info;
 
 
     // Use this for initialization
@@ -44,8 +44,9 @@ public class GemsCollection : MonoBehaviour {
             }
             //Set random number of obj to be collected
             menu_score = UsefulFunctions.RndObjNumber();
-            total_score.text = menu_score.ToString();
-            score_gained.text = score.ToString();
+            //Update score and gems info
+            gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
+            score_gained.text = "Score: " + 0;
             //Randomize gem
             collectObj = UsefulFunctions.ChooseGem(); 
             //Checks if the trial is with or without Oculus to activate the right player prefab
@@ -92,12 +93,15 @@ public class GemsCollection : MonoBehaviour {
                 menu_score = UsefulFunctions.RndObjNumber();
             }
         }
-        /*
-        if (Input.GetKey(KeyCode.Escape))
+        //Checks if game is paused
+        if(UsefulFunctions.isGamePaused())
         {
             pause_menu.SetActive(true);
             pause_t = trial_t;
-        }*/
+            //Disable joystick movements
+            player.GetComponent<CharacterController>().enabled = false;
+            player.GetComponent<MouseLook>().enabled = false;
+        }
     }
 
     //Object collision
@@ -108,7 +112,7 @@ public class GemsCollection : MonoBehaviour {
         AudioSource audio = player.GetComponent<AudioSource>();
         audio.Play();
         score++;
-        score_gained.text = score.ToString();
+        gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
         UsefulFunctions.MainInfoSaving(collectObj);
         /*
         if (togo == 0)
@@ -144,6 +148,49 @@ public class GemsCollection : MonoBehaviour {
         UsefulFunctions.pathTrials++;*/
     }
 
+
+    //If resume button is pressed it restarts trial time from where it was before pausing
+    public void ResumeButtonPressed()
+    {
+        trial_t = pause_t;
+        pause_menu.SetActive(false);
+        //Player can move again
+        player.GetComponent<CharacterController>().enabled = true;
+        player.GetComponent<MouseLook>().enabled = true;
+        Debug.Log("Game resumed");
+    }
+
+    //If exit button is pressed it saves all the data collected until now
+    public void ExitButtonPressed()
+    {
+        //Saves data until that moment
+        UsefulFunctions.MainInfoSaving(player); //Saves last position
+        //Saves all variables in files
+        try
+        {
+            isSaving = true;
+            _data = UsefulFunctions.SerializeObject(trialInfo);
+            UsefulFunctions.CreateXML(_FileLocation, _data);
+            Debug.Log("Main trial data Saved");
+            _data = UsefulFunctions.SerializeObject(trialPath);
+            UsefulFunctions.CreateXML(_FileLocation, _data);
+            Debug.Log("Overall path data Saved");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError(ex.ToString());
+        }
+        finally
+        {
+            isSaving = false;
+        }
+
+        //Loads last page
+        Application.LoadLevel(4);
+        Debug.Log("Game ended...Saving data...");
+    }
+
+    //Reinitializes variables in the scene for new trial
     public void ReinitializeVariables()
     {
         trial_t = 0.0f;

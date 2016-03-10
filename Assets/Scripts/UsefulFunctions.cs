@@ -72,6 +72,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.time = GemsCollection.trial_t;
             GemsCollection.trialInfo.Add(info);
             info = new MainTrialInfo.InfoTrial();
+            info.ID = "Treasure Position";
             info.s_x = GameObject.FindGameObjectWithTag("Treasure").transform.position.x;
             info.s_y = GameObject.FindGameObjectWithTag("Treasure").transform.position.y;
             info.s_z = GameObject.FindGameObjectWithTag("Treasure").transform.position.z;
@@ -459,7 +460,8 @@ public class UsefulFunctions : MonoBehaviour {
         bool check = false;
         if ((GameObject.FindGameObjectWithTag("Player") != null) || (GameObject.FindGameObjectsWithTag("OculusPlayer") != null))
         {
-            if (Input.GetButton("A") || Input.GetButton("OtherX"))
+            //Allows input from Xbox360 controller, generic controller and Mac users
+            if (Input.GetButton("A") || Input.GetButton("OtherX") || Input.GetButton("MacX"))
             {
                 check = true;
             }
@@ -471,9 +473,23 @@ public class UsefulFunctions : MonoBehaviour {
         return check;
     }
 
-    public static void Feedback()
+    //Checks if player pressed pause
+    public static bool isGamePaused()
     {
-        GameObject.FindGameObjectWithTag("Player").SetActive(false);
+        bool check = false;
+
+        if ((GameObject.FindGameObjectWithTag("Player") != null) || (GameObject.FindGameObjectsWithTag("OculusPlayer") != null))
+        {
+            //Allows input from Xbox360 controller, generic controller and Mac users
+            if (Input.GetButton("BackButton") || Input.GetButton("BackButtonMac") || Input.GetButton("GenericBackButton"))
+            {
+                check = true;
+            }
+        }
+        else {
+            check = false;
+        }
+        return check;
     }
 
     //Save info into XML files
@@ -555,4 +571,22 @@ if (waitForButton) {
 		}
 	}
 
-*/
+    public static bool nextButton()
+    {
+        bool check = false;
+
+        if ((GameObject.FindGameObjectWithTag("Player") != null) || (GameObject.FindGameObjectsWithTag("OculusPlayer") != null))
+        {
+            //Allows input from Xbox360 controller, generic controller and Mac users
+            if (Input.GetButton("Ok") || Input.GetButton("OkMac") || Input.GetButton("OkGeneric"))
+            {
+                check = true;
+            }
+        }
+        else {
+            check = false;
+        }
+        return check;
+
+    }*/
+

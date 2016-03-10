@@ -69,7 +69,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Island pack\Standard Assets\Character Controllers\Sources\Scripts\MouseLook.cs" />
     <Compile Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\ColorCorrectionEffect.cs" />
     <Compile Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\ContrastStretchEffect.cs" />
     <Compile Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\GlowEffect.cs" />
@@ -113,9 +112,11 @@
     <Compile Include="Assets\OVR\Scripts\Util\OVRScreenFade.cs" />
     <Compile Include="Assets\OVR\Scripts\Util\OVRTrackerBounds.cs" />
     <Compile Include="Assets\Scripts\CompletePath.cs" />
+    <Compile Include="Assets\Scripts\Feedback.cs" />
     <Compile Include="Assets\Scripts\GemsCollection.cs" />
     <Compile Include="Assets\Scripts\MainTrialInfo.cs" />
     <Compile Include="Assets\Scripts\MenuStart.cs" />
+    <Compile Include="Assets\Scripts\MouseLook.cs" />
     <Compile Include="Assets\Scripts\SaveInfo.cs" />
     <Compile Include="Assets\Scripts\UsefulFunctions.cs" />
   </ItemGroup>
