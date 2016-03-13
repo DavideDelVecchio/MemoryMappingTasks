@@ -1,24 +1,35 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 
 public class GemsCollection : MonoBehaviour {
 
-    public GameObject player, treasure,start_menu,pause_menu;
+    public GameObject player, treasure,start_menu,pause_menu,feedback_menu, feedback_text_def, fd;
     public static GameObject collectObj;
     public static int currentEnv;
-    int menu_score,score = 0;
-    public static float pause_t, trial_t, collision_t = 0.0f;
+    public static Vector3 goal_position, last_position;
+    int menu_score, score, score_ui; //barPercentage = 0;
+    public static float pause_t, trial_t, collision_t, distance = 0.0f;
     float old, duration = 0.0f;
     bool checkButtonPressed, isSaving;
-    bool isNewTrial = false;
-    public static string _FileName = "";
+    bool isNewTrial, waitForButton = false;
+    public static string _FileName, score_text = "";
     string _FileLocation, _data, subName;
     public static List<MainTrialInfo.InfoTrial> trialInfo = new List<MainTrialInfo.InfoTrial>();
     public static List<CompletePath.PathMapping> trialPath = new List<CompletePath.PathMapping>();
-    public Text score_gained, gems_info;
+    public static DistanceAndFeedBack.FeedbackInfo feedbackInfo;
+    public static List<DistanceAndFeedBack.FeedbackInfo> trialFeedback = new List<DistanceAndFeedBack.FeedbackInfo>();
+    public Text score_gained, gems_info,feedback_text;
+    public GameObject loadingBarR, loadingBarY, loadingBarG;
+    public Text textIndicator, percentage;
+    float speed = 30;
+    public float currentAmount;
+    public int error, barPercentage = 0;
+
+
 
 
     // Use this for initialization
@@ -46,7 +57,7 @@ public class GemsCollection : MonoBehaviour {
             menu_score = UsefulFunctions.RndObjNumber();
             //Update score and gems info
             gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
-            score_gained.text = "Score: " + 0;
+            score_gained.text = "0";
             //Randomize gem
             collectObj = UsefulFunctions.ChooseGem(); 
             //Checks if the trial is with or without Oculus to activate the right player prefab
@@ -55,7 +66,8 @@ public class GemsCollection : MonoBehaviour {
             UsefulFunctions.MainInfoSaving(player); //Saves player and treasure position
             //Define file location
             _FileLocation = Application.dataPath + "/SubTrialInfo";
-            //Store in variables prefabs info from menu
+            //Saves the treasure position
+            goal_position = treasure.transform.position;
         }
     }
 	
@@ -67,7 +79,10 @@ public class GemsCollection : MonoBehaviour {
         {
             if (UsefulFunctions.OnButtonPression() == true)
             {
+                score_text = score_gained.text;
                 UsefulFunctions.MainInfoSaving(player); //Saves last position
+                last_position = player.transform.position;
+                distance = Vector3.Distance(goal_position, last_position);
                 //Saves all variables in files
                 try
                 {
@@ -87,7 +102,6 @@ public class GemsCollection : MonoBehaviour {
                 {
                     isSaving = false;
                 }
-                //Feedback
                 //Check env state and randomize obj number
                 currentEnv = UsefulFunctions.RndEnvironment();
                 menu_score = UsefulFunctions.RndObjNumber();
@@ -152,12 +166,22 @@ public class GemsCollection : MonoBehaviour {
     //If resume button is pressed it restarts trial time from where it was before pausing
     public void ResumeButtonPressed()
     {
-        trial_t = pause_t;
-        pause_menu.SetActive(false);
-        //Player can move again
-        player.GetComponent<CharacterController>().enabled = true;
-        player.GetComponent<MouseLook>().enabled = true;
-        Debug.Log("Game resumed");
+        if(pause_menu.activeSelf)
+        {
+            trial_t = pause_t;
+            pause_menu.SetActive(false);
+            //Player can move again
+            player.GetComponent<CharacterController>().enabled = true;
+            player.GetComponent<MouseLook>().enabled = true;
+            Debug.Log("Game resumed");
+        }
+        else if (feedback_menu.activeSelf)
+        {
+            feedback_menu.SetActive(false);
+            Debug.Log("Next Trial");
+            waitForButton = true;
+        }
+
     }
 
     //If exit button is pressed it saves all the data collected until now
@@ -190,6 +214,39 @@ public class GemsCollection : MonoBehaviour {
         Debug.Log("Game ended...Saving data...");
     }
 
+
+    void FeedbackTextVisualization()
+    {
+        string fs = score_gained.text;
+        if (feedbackInfo.color == "Red")
+        {
+            score_ui = Int32.Parse(fs);
+            score_ui = score_ui + 25;
+            score_gained.text = score_ui.ToString();
+            feedback_text_def.SetActive(false);
+            fd.SetActive(true);
+            feedback_text.text = "Better luck next time, mate! Here, take 25 coins.";
+        }
+        else if(feedbackInfo.color == "Yellow")
+        {
+            score_ui = Int32.Parse(fs);
+            score_ui = score_ui + 50;
+            score_gained.text = score_ui.ToString();
+            feedback_text_def.SetActive(false);
+            fd.SetActive(true);
+            feedback_text.text = "Almost there mate! 50 coins for you!";
+        }
+        else
+        {
+            score_ui = Int32.Parse(fs);
+            score_ui = score_ui + 100;
+            score_gained.text = score_ui.ToString();
+            feedback_text_def.SetActive(false);
+            fd.SetActive(true);
+            feedback_text.text = "Well done mate! You gained 100 coins!! Keep it up!";
+        }
+    }
+
     //Reinitializes variables in the scene for new trial
     public void ReinitializeVariables()
     {
@@ -198,6 +255,7 @@ public class GemsCollection : MonoBehaviour {
         score = 0;
         menu_score = 0;
         _data = null;
+        waitForButton = false;
         trialInfo.Clear();
         trialPath.Clear();
         Debug.Log("Variables reinitialized.");

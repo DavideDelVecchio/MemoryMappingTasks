@@ -16,6 +16,7 @@ public class MainTrialInfo : ISerializable
         public float s_y;
         public float s_z;
         public float time;
+        public float d;
 
         public InfoTrial() {
             ID = string.Empty;
@@ -23,6 +24,7 @@ public class MainTrialInfo : ISerializable
             s_y = 0;
             s_z = 0;
             time = 0;
+            d = 0;
         }
 
            
@@ -33,12 +35,11 @@ public class MainTrialInfo : ISerializable
             info.AddValue("posy", s_y);
             info.AddValue("posz", s_z);
             info.AddValue("time", time);
+            info.AddValue("distance", d);
         }
 }
         public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
         {
         }
-
-    
 
 }

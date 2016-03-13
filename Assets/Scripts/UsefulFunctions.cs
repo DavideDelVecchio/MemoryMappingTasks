@@ -15,6 +15,7 @@ public class UsefulFunctions : MonoBehaviour {
     public static int current_level,current_trial,tot_env1, tot_env2, tot_env3, nobj1, nobj2, nobj3, old_env = 0;
     public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
     public static CompletePath.PathMapping objPath;// = new PlayerInfo.PathMapping();
+    
 
 
     //If Oculus is toggled activates the right player prefab
@@ -98,6 +99,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
             info.time = GemsCollection.trial_t;
+            info.d = Vector3.Distance(GemsCollection.goal_position, GemsCollection.last_position);
             GemsCollection.trialInfo.Add(info);
         }
     }
@@ -231,7 +233,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else
                 {
-                    envItems.Add(GameObject.FindGameObjectWithTag("OculusPlayer").transform.position);
+                    //envItems.Add(GameObject.FindGameObjectWithTag("OculusPlayer").transform.position);
                 }
                 
             }
@@ -347,11 +349,28 @@ public class UsefulFunctions : MonoBehaviour {
         else {
             if (tot_trials == 90)
             {
+                bool isSaving;
+                string _data;
+                string _FileLocation = Application.dataPath + "/SubTrialInfo";
+                try
+                {
+                    isSaving = true;
+                    _data = SerializeObject(GemsCollection.trialFeedback);
+                    UsefulFunctions.CreateXML(_FileLocation, _data);
+                    Debug.Log("Main trial data Saved");
+                    }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError(ex.ToString());
+                }
+                finally
+                {
+                    isSaving = false;
+                }
                 Application.LoadLevel(4); //End scene
             }
             return 4;
-        }
-        */
+        } */
     }
 
     //Checks if the block is concluded
@@ -520,9 +539,15 @@ public class UsefulFunctions : MonoBehaviour {
             xs = new XmlSerializer(typeof(List<MainTrialInfo.InfoTrial>));
             GemsCollection._FileName = PlayerPrefs.GetString("SubjID") + "_MainTrialInfo" + current_trial + ".xml";
         }
-        else {
+        else if (pObject.GetType() == typeof(List<CompletePath.PathMapping>))
+        {
             xs = new XmlSerializer(typeof(List<CompletePath.PathMapping>));
             GemsCollection._FileName = PlayerPrefs.GetString("SubjID") + "_CompleteTrialPath" + current_trial + ".xml";
+        }
+        else
+        {
+            xs = new XmlSerializer(typeof(List<DistanceAndFeedBack.FeedbackInfo>));
+            GemsCollection._FileName = PlayerPrefs.GetString("SubjID") + "_FeedbackTrials" + ".xml";
         }
         XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
         xmlTextWriter.Formatting = Formatting.Indented;
