@@ -9,9 +9,9 @@ public class GemsCollection : MonoBehaviour {
 
     public GameObject player, treasure,start_menu,pause_menu,feedback_menu, feedback_text_def, fd;
     public static GameObject collectObj;
-    public static int currentEnv;
+    public static int currentEnv,score;
     public static Vector3 goal_position, last_position;
-    int menu_score, score, score_ui; //barPercentage = 0;
+    int menu_score, score_ui; //barPercentage = 0;
     public static float pause_t, trial_t, collision_t, distance = 0.0f;
     float old, duration = 0.0f;
     bool checkButtonPressed, isSaving;
@@ -54,14 +54,12 @@ public class GemsCollection : MonoBehaviour {
                 UsefulFunctions.gems = GameObject.FindGameObjectsWithTag("Gems");
             }
             //Set random number of obj to be collected
-            menu_score = UsefulFunctions.RndObjNumber();
+            menu_score = UnityEngine.Random.Range(1, 3);
             //Update score and gems info
             gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
             score_gained.text = "0";
             //Randomize gem
             collectObj = UsefulFunctions.ChooseGem(); 
-            //Checks if the trial is with or without Oculus to activate the right player prefab
-            UsefulFunctions.ActivatePlayerPrefab();
             UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
             UsefulFunctions.MainInfoSaving(player); //Saves player and treasure position
             //Define file location
@@ -103,8 +101,8 @@ public class GemsCollection : MonoBehaviour {
                     isSaving = false;
                 }
                 //Check env state and randomize obj number
-                currentEnv = UsefulFunctions.RndEnvironment();
-                menu_score = UsefulFunctions.RndObjNumber();
+                //currentEnv = UsefulFunctions.RndEnvironment();
+                menu_score = menu_score = UnityEngine.Random.Range(1, 3);
             }
         }
         //Checks if game is paused
@@ -212,39 +210,6 @@ public class GemsCollection : MonoBehaviour {
         //Loads last page
         Application.LoadLevel(4);
         Debug.Log("Game ended...Saving data...");
-    }
-
-
-    void FeedbackTextVisualization()
-    {
-        string fs = score_gained.text;
-        if (feedbackInfo.color == "Red")
-        {
-            score_ui = Int32.Parse(fs);
-            score_ui = score_ui + 25;
-            score_gained.text = score_ui.ToString();
-            feedback_text_def.SetActive(false);
-            fd.SetActive(true);
-            feedback_text.text = "Better luck next time, mate! Here, take 25 coins.";
-        }
-        else if(feedbackInfo.color == "Yellow")
-        {
-            score_ui = Int32.Parse(fs);
-            score_ui = score_ui + 50;
-            score_gained.text = score_ui.ToString();
-            feedback_text_def.SetActive(false);
-            fd.SetActive(true);
-            feedback_text.text = "Almost there mate! 50 coins for you!";
-        }
-        else
-        {
-            score_ui = Int32.Parse(fs);
-            score_ui = score_ui + 100;
-            score_gained.text = score_ui.ToString();
-            feedback_text_def.SetActive(false);
-            fd.SetActive(true);
-            feedback_text.text = "Well done mate! You gained 100 coins!! Keep it up!";
-        }
     }
 
     //Reinitializes variables in the scene for new trial

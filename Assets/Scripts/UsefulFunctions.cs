@@ -8,57 +8,16 @@ using System.Linq;
 using System.Collections;
 
 public class UsefulFunctions : MonoBehaviour {
-    public static GameObject[] gems,totems,invisibleBorders,islandItems,palms,woods,waves;
+    public static GameObject[] gems,totems,invisibleBorders,islandItems,palms,woods,waves,fence;
     public static List<Vector3> envItems = new List<Vector3>();
     public static List<int> levels = new List<int> {1,2,3}; //up to 5 if we add two more levels
-    public static int tot_trials = 90;
-    public static int current_level,current_trial,tot_env1, tot_env2, tot_env3, nobj1, nobj2, nobj3, old_env = 0;
+    public static int tot_trials = 30;
+    public static int current_level,current_trial = 0;
+    public static int max_repetition_env = 5;
+    public static int env1, env2, env3 = 0;
     public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
     public static CompletePath.PathMapping objPath;// = new PlayerInfo.PathMapping();
     
-
-
-    //If Oculus is toggled activates the right player prefab
-    public static void ActivatePlayerPrefab()
-    {
-        if (PlayerPrefs.GetInt("Oculus") == 0)
-        {
-            //Activate First Person player, the trial is without Oculus
-            if (GameObject.FindGameObjectWithTag("Player") != null) {
-                if (!GameObject.FindGameObjectWithTag("Player").activeSelf)
-                {
-                    GameObject.FindGameObjectWithTag("Player").SetActive(true);
-                }
-            }
-
-            if (GameObject.FindGameObjectWithTag("OculusPlayer") != null)
-            {
-                if (GameObject.FindGameObjectWithTag("OculusPlayer").activeSelf)
-                {
-                    GameObject.FindGameObjectWithTag("OculusPlayer").SetActive(false);
-                }
-            }
-        }
-        else
-        {
-            //Activate OVR player, the trial is with Oculus
-            if (GameObject.FindGameObjectWithTag("Player") != null)
-            {
-                if (GameObject.FindGameObjectWithTag("Player").activeSelf)
-                {
-                    GameObject.FindGameObjectWithTag("Player").SetActive(false);
-                }
-            }
-
-            if (GameObject.FindGameObjectWithTag("OculusPlayer") != null)
-            {
-                if (!GameObject.FindGameObjectWithTag("OculusPlayer").activeSelf)
-                {
-                    GameObject.FindGameObjectWithTag("OculusPlayer").SetActive(true);
-                }
-            }
-        }
-    }
 
     //Main Trial information saving
     public static void MainInfoSaving(GameObject obj)
@@ -71,6 +30,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
             info.time = GemsCollection.trial_t;
+            info.score = GemsCollection.score;
             GemsCollection.trialInfo.Add(info);
             info = new MainTrialInfo.InfoTrial();
             info.ID = "Treasure Position";
@@ -78,6 +38,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = GameObject.FindGameObjectWithTag("Treasure").transform.position.y;
             info.s_z = GameObject.FindGameObjectWithTag("Treasure").transform.position.z;
             info.time = GemsCollection.trial_t;
+            info.score = GemsCollection.score;
             GemsCollection.trialInfo.Add(info);
 
         }
@@ -89,6 +50,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
             info.time = GemsCollection.trial_t;
+            info.score = GemsCollection.score;
             GemsCollection.trialInfo.Add(info);
         }
         else
@@ -99,6 +61,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
             info.time = GemsCollection.trial_t;
+            info.score = GemsCollection.score;
             info.d = Vector3.Distance(GemsCollection.goal_position, GemsCollection.last_position);
             GemsCollection.trialInfo.Add(info);
         }
@@ -181,6 +144,15 @@ public class UsefulFunctions : MonoBehaviour {
                 envItems.Add(g.transform.position);
             }
         }
+        //Fence
+        fence = GameObject.FindGameObjectsWithTag("Fence");
+        if (fence != null)
+        {
+            foreach(GameObject g in fence)
+            {
+                envItems.Add(g.transform.position);
+            }
+        }
     }
 
     //Randomize the obj position in the scene
@@ -189,66 +161,68 @@ public class UsefulFunctions : MonoBehaviour {
         //Variables
         float x, z;
         bool checkPosition = true;
-        Vector3 distancePT = new Vector3(0.28f, 0f, -1.52f);
+        string tag = obj.tag;
         GameObject treasure = GameObject.FindGameObjectWithTag("Treasure");
+        Vector3 distancePT = new Vector3(treasure.transform.position.x - obj.transform.position.x, 0, treasure.transform.position.z - obj.transform.position.z); //Distance between player and the treasure
+        Vector3 oldTreasurePosition = treasure.transform.position;
+        Vector3 oldPosition = obj.transform.position;
+
         //Clears list env obj
-        if (envItems.Count != 0) {
+        if (envItems.Count != 0)
+        {
             envItems.Clear();
         }
         //Find obj in the environments
         EnvironmentalClues();
 
+        //If the obj is the player we need to add the gem position
+        //in constrast if obj is the gem we need to add player position
+        if (tag == "Player" || tag == "OculusPlayer")
+        {
+            envItems.Add(GemsCollection.collectObj.transform.position);
+        }
+        else
+        {
+            switch (PlayerPrefs.GetInt("Oculus"))
+            {
+                //Default case
+                case 0:
+                    envItems.Add(GameObject.FindGameObjectWithTag("Player").transform.position);
+                    break;
+                //Oculus case
+                case 1:
+                    envItems.Add(GameObject.FindGameObjectWithTag("OculusPlayer").transform.position);
+                    break;
+            }
+        }
+
         //Calculates new position
         while (checkPosition)
         {
-            x = Random.Range(258f, 914f);
-            z = Random.Range(521f, 763f);
-
-            if (258f <= x && x <= 304f)
-            {
-                z = Random.Range(752f, 770f);
-            }
-            else if (305f <= x && x <= 384f)
-            {
-                z = Random.Range(586f, 802f);
-            }
-            else if (914f <= x && x <= 971f) {
-                z = Random.Range(763f, 823f);
-            }
-
-            Vector3 oldPosition = obj.transform.position;
-            
-            //If the obj is the player we need to add the gem position
-            //in constrast if obj is the gem we need to add player position
-            if (obj.tag == "Player" || obj.tag == "OculusPlayer")
-            {
-                Vector3 oldTreasurePosition = treasure.transform.position;
-                envItems.Add(GemsCollection.collectObj.transform.position);
-            }
-            else
-            {
-                if (obj.tag == "Player")
-                {
-                    envItems.Add(GameObject.FindGameObjectWithTag("Player").transform.position);
-                }
-                else
-                {
-                    //envItems.Add(GameObject.FindGameObjectWithTag("OculusPlayer").transform.position);
-                }
-                
-            }
+            x = Random.Range(413.071f, 863.15f);
+            z = Random.Range(528.554f, 828.4f);
 
             //Checks if the position is free
             Vector3 newPositionP = new Vector3(x, oldPosition.y, z);
-            if ((totems == null && islandItems == null && palms == null && woods == null) || (!envItems.Contains(newPositionP)))
+
+            foreach (Vector3 v in envItems)
             {
-                obj.transform.position = newPositionP;
-                if(obj.tag == "Player" || obj.tag == "OculusPlayer")
+                if ((v.x != newPositionP.x && v.z != newPositionP.z) || (v.x != newPositionP.x && v.z == newPositionP.z) || (v.x == newPositionP.x && v.z != newPositionP.z))
                 {
-                    Vector3 newPositionT = new Vector3(newPositionP.x + distancePT.x, 0, newPositionP.z + distancePT.z);
-                    treasure.transform.position = newPositionT;
+                    obj.transform.position = newPositionP;
+                    if(tag == "Player"|| tag == "OculusPlayer")
+                    {
+                        Vector3 newPositionT = new Vector3(newPositionP.x + distancePT.x, 0, newPositionP.z + distancePT.z);
+                        treasure.transform.position = newPositionT;
+                    }
+                    checkPosition = false;
                 }
-                checkPosition = false;
+                else
+                {
+                    obj.transform.position = oldPosition;
+                    Debug.Log("Cannot change test position, there's already an object");
+                    break;
+                }
             }
         }
     }
@@ -297,10 +271,163 @@ public class UsefulFunctions : MonoBehaviour {
     }
 
     //Randomize the environment
-    public static int RndEnvironment()
+    public static void RndEnvironment()
     {
-        Application.LoadLevel(2);
-        return 2;
+        //Possible environmental order
+        //0: Distal Cues, Distal Cues and Boundaries, Distal Cues and Landmarks 1 2 3
+        //1: Distal Cues, Distal Cues and Landmarks, Distal Cues and Boundaries 1 3 2
+        //2: Distal Cues and Boundaries, Distal Cues, Distal Cues and Landmarks 2 1 3
+        //3: Distal Cues and Boundaries, Distal Cues and Landmarks, Distal Cues 2 3 1
+        //4: Distal Cues and Landmarks, Distal Cues and Boundaries, Distal Cues 3 2 1
+        //5: Distal Cues and Landmarks, Distal Cues, Distal cues and Boundaries 3 1 2
+        
+        //Checks the experimental status and ends it if necessary 
+        CheckExpStatus();
+        int env = PlayerPrefs.GetInt("EnvOrder");
+        switch (env)
+        {
+            case 0:
+                //Level 1, 2, 3
+                if(env1 < 5 && env2 == 0 && env3 == 0)
+                {
+                    env1++;
+                    Application.LoadLevel(1);
+                }
+                else if(env2 < 5 && env1 == 5 && env3 == 0)
+                {
+                    env2++;
+                    Application.LoadLevel(2);
+                }
+                else if (env3 < 5 && env1 == 5 && env2 == 5)
+                {
+                    env3++;
+                    Application.LoadLevel(3);
+                }
+                else if (env1 == 5 && env2 ==5 && env3 == 5)
+                {
+                    Application.LoadLevel(6);
+                }
+                break;
+            case 1:
+                //Level 1 3 2
+                if (env1 < 5 && env2 == 0 && env3 == 0)
+                {
+                    env1++;
+                    Application.LoadLevel(1);
+                }
+                else if (env3 < 5 && env1 == 5 && env2 == 0)
+                {
+                    env3++;
+                    Application.LoadLevel(3);
+                }
+                else if (env2 < 5 && env1 == 5 && env3 == 5)
+                {
+                    env2++;
+                    Application.LoadLevel(2);
+                }
+                else if (env1 == 5 && env2 == 5 && env3 == 5)
+                {
+                    Application.LoadLevel(6);
+                }
+                break;
+            case 2:
+                //Level 2 1 3
+                if (env1 < 5 && env2 == 0 && env3 == 0)
+                {
+                    env1++;
+                    Application.LoadLevel(1);
+                }
+                else if (env2 < 5 && env1 == 5 && env3 == 0)
+                {
+                    env2++;
+                    Application.LoadLevel(2);
+                }
+                else if (env3 < 5 && env1 == 5 && env2 == 5)
+                {
+                    env3++;
+                    Application.LoadLevel(3);
+                }
+                else if (env1 == 5 && env2 == 5 && env3 == 5)
+                {
+                    Application.LoadLevel(6);
+                }
+                break;
+            case 3:
+                //Level 2 3 1
+                if (env2 < 5 && env1 == 0 && env3 == 0)
+                {
+                    env2++;
+                    Application.LoadLevel(2);
+                }
+                else if (env3 < 5 && env2 == 5 && env1 == 0)
+                {
+                    env3++;
+                    Application.LoadLevel(3);
+                }
+                else if (env1 < 5 && env2 == 5 && env3 == 5)
+                {
+                    env1++;
+                    Application.LoadLevel(1);
+                }
+                else if (env1 == 5 && env2 == 5 && env3 == 5)
+                {
+                    Application.LoadLevel(6);
+                }
+                break;
+            case 4:
+                //Level 3 2 1
+                if (env3 < 5 && env2 == 0 && env1 == 0)
+                {
+                    env3++;
+                    Application.LoadLevel(3);
+                }
+                else if (env2 < 5 && env3 == 5 && env1 == 0)
+                {
+                    env2++;
+                    Application.LoadLevel(2);
+                }
+                else if (env1 < 5 && env2 == 5 && env3 == 5)
+                {
+                    env1++;
+                    Application.LoadLevel(1);
+                }
+                else if (env1 == 5 && env2 == 5 && env3 == 5)
+                {
+                    Application.LoadLevel(6);
+                }
+                break;
+            case 5:
+                //Level 3 1 2
+                if (env3 < 5 && env1 == 0 && env1 == 0)
+                {
+                    env3++;
+                    Application.LoadLevel(3);
+                }
+                else if (env1 < 5 && env3 == 5 && env2 == 0)
+                {
+                    env1++;
+                    Application.LoadLevel(1);
+                }
+                else if (env2 < 5 && env1 == 5 && env3 == 5)
+                {
+                    env2++;
+                    Application.LoadLevel(2);
+                }
+                else if (env1 == 5 && env2 == 5 && env3 == 5)
+                {
+                    Application.LoadLevel(6);
+                }
+                break;
+        }
+
+        //Debug.Log(env);
+
+
+
+
+
+        //Application.LoadLevel(2);
+        //return 2;
         /*
         if (levels.Count != 0)
         {
@@ -373,9 +500,26 @@ public class UsefulFunctions : MonoBehaviour {
         } */
     }
 
+
+    public static void CheckExpStatus()
+    {
+        if(current_trial == 15)
+        {
+            //Break point
+            Application.LoadLevel(5);
+        }
+        else if (current_trial == tot_trials)
+        {
+            //End experiment
+            Application.LoadLevel(6);
+        }
+    }
+
+
     //Checks if the block is concluded
     public static int CheckEnvState(int e)
     {
+        /*
         int isEnvReachedLimit = 2; //0 when is not, 1 when it has reached 30 trials
         switch (e)
         {
@@ -431,46 +575,8 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 break;
         }
-        return isEnvReachedLimit;
-    }
-
-    //Randomize the number of obj to be collected
-    public static int RndObjNumber()
-    {
-        bool isLimitReached = true;
-        int o = 0;
-        while (isLimitReached)
-        {
-            o = Random.Range(1, 3); //min and max of collectable obj in the scene during trial
-            switch (o)
-            {
-                case 1:
-                    if (nobj1 < 10)
-                    {
-                        nobj1++;
-                        isLimitReached = false;
-                        break;
-                    }
-                    break;
-                case 2:
-                    if (nobj2 < 10)
-                    {
-                        nobj2++;
-                        isLimitReached = false;
-                        break;
-                    }
-                    break;
-                case 3:
-                    if (nobj3 < 10)
-                    {
-                        nobj3++;
-                        isLimitReached = false;
-                        break;
-                    }
-                    break;
-            }
-        }
-        return o; 
+        return isEnvReachedLimit; */
+        return 0;
     }
 
     //Checks if a button is pressed

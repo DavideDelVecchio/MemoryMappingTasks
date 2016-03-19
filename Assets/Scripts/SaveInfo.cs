@@ -6,6 +6,7 @@ public class SaveInfo : MonoBehaviour {
     public GameObject sbj,save;
     public Toggle oculus;
     public InputField sbjname;
+    public Dropdown env_order;
     public int level = 0;
 
     //Levels:
@@ -35,13 +36,12 @@ public class SaveInfo : MonoBehaviour {
         else {
             PlayerPrefs.SetInt("Oculus", 0); //Exp without Oculus
         }
-        //Choose randomly which enviroment to show as first block
-        PlayerPrefs.SetInt("CurrentEnv", UsefulFunctions.RndEnvironment());
-    }
 
-    public void onCancelClick()
-    {
-        Application.Quit();
+        PlayerPrefs.SetInt("EnvOrder", env_order.value);
+        UsefulFunctions.env1 = 0;
+        UsefulFunctions.env2 = 0;
+        UsefulFunctions.env3 = 0;
+        UsefulFunctions.RndEnvironment();
     }
 
 
