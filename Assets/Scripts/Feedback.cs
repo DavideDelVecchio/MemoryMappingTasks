@@ -1,189 +1,106 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System;
 using System.Collections;
 
 public class Feedback : MonoBehaviour
 {
 
-    public GameObject loadingBarR, loadingBarY, loadingBarG, fd, feedback_intro;
-    public Text textIndicator, percentage;
-    public float currentAmount, speed;
-    public int error, score_ui;
-    public int barPercentage = 0;
+    public GameObject startTrialMenu,feedbackMenu,firstTime,quitButton,nextButton,treasureFull,treasureMedium,treasureEmpty;
     public Text score_gained, feedback_text;
-    public int distance;
-    bool points_given = false;
-
-
+    public int d,error, score_ui;
+    
     void Awake()
     {
-        points_given = false;
-    }
-
-
-    void Update()
-    {
-        CheckError();
-        switch (error)
+        if (UsefulFunctions.current_trial == 0)
         {
-            case 25:
-                if (currentAmount <= barPercentage)
-                {
-                    currentAmount += speed * Time.deltaTime;
-                    percentage.text = ((int)currentAmount).ToString() + "%";
-                }
-                else
-                {
-                    textIndicator.text = "DONE!";
-                }
-                loadingBarG.SetActive(false);
-                loadingBarY.SetActive(false);
-                loadingBarR.SetActive(true);
-                //Red loading
-                loadingBarR.GetComponent<Image>().fillAmount = currentAmount / 100;
-                break;
-            case 75:
-                if (currentAmount <= barPercentage)
-                {
-                    currentAmount += speed * Time.deltaTime;
-                    percentage.text = ((int)currentAmount).ToString() + "%";
-                }
-                else
-                {
-                    textIndicator.text = "DONE!";
-                }
-                loadingBarG.SetActive(false);
-                loadingBarR.SetActive(false);
-                loadingBarY.SetActive(true);
-                //Yellow loading
-                loadingBarY.GetComponent<Image>().fillAmount = currentAmount / 100;
-                break;
-            case 100:
-                if (currentAmount <= barPercentage)
-                {
-                    currentAmount += speed * Time.deltaTime;
-                    percentage.text = ((int)currentAmount).ToString() + "%";
-                }
-                else
-                {
-                    textIndicator.text = "DONE!";
-                }
-                loadingBarY.SetActive(false);
-                loadingBarR.SetActive(false);
-                loadingBarG.SetActive(true);
-                //Green loading
-                loadingBarG.GetComponent<Image>().fillAmount = currentAmount / 100;
-                break;
+            startTrialMenu.SetActive(true);
+            feedbackMenu.SetActive(false);
         }
-        GemsCollection.feedbackInfo = new DistanceAndFeedBack.FeedbackInfo();
-        GemsCollection.feedbackInfo.ID = PlayerPrefs.GetString("SubjID") + UsefulFunctions.current_trial;
-        GemsCollection.feedbackInfo.g_x = GemsCollection.goal_position.x;
-        GemsCollection.feedbackInfo.g_y = GemsCollection.goal_position.y;
-        GemsCollection.feedbackInfo.g_z = GemsCollection.goal_position.z;
-        GemsCollection.feedbackInfo.e_x = GemsCollection.last_position.x;
-        GemsCollection.feedbackInfo.e_y = GemsCollection.last_position.y;
-        GemsCollection.feedbackInfo.e_z = GemsCollection.last_position.z;
-        GemsCollection.feedbackInfo.distance = GemsCollection.distance;
-        if(!points_given)
-            FeedbackTextVisualization();
+        else
+        {
+            startTrialMenu.SetActive(false);
+            feedbackMenu.SetActive(true);
+        }
+
+    }
+    
+    void Start()
+    {
+        FeedbackVisualization();
     }
 
-
-    void CheckError()
+    public void FeedbackVisualization()
     {
-        if ( distance <= 25) //GemsCollection.distance is 100
+        //Saves info about feedback
+        if (!startTrialMenu.activeSelf)
         {
-            error = 100;
-            if (distance < 12f)
+            
+            GemsCollection.feedbackInfo = new DistanceAndFeedBack.FeedbackInfo();
+            GemsCollection.feedbackInfo.ID = PlayerPrefs.GetString("SubjID") + UsefulFunctions.current_trial;
+            GemsCollection.feedbackInfo.g_x = GemsCollection.goal_position.x;
+            GemsCollection.feedbackInfo.g_y = GemsCollection.goal_position.y;
+            GemsCollection.feedbackInfo.g_z = GemsCollection.goal_position.z;
+            GemsCollection.feedbackInfo.e_x = GemsCollection.last_position.x;
+            GemsCollection.feedbackInfo.e_y = GemsCollection.last_position.y;
+            GemsCollection.feedbackInfo.e_z = GemsCollection.last_position.z;
+            GemsCollection.feedbackInfo.distance = GemsCollection.distance;
+
+            d = (int)Demo.distance;
+            string score_t;
+            if (score_gained.text != string.Empty)
             {
-                barPercentage = 100;
-            }
-            else if (distance < 20f && distance >= 12f)
-            {
-                barPercentage = 80;
+                score_t = score_gained.text;
             }
             else
             {
-                barPercentage = 75;
+                score_t = "0";
             }
-        }
-        else if (distance < 75f)
-        {
-            error = 75;
-            if (distance > 60f)
+
+            if (d < 25 && d >= 0)
             {
-                barPercentage = 70;
+                treasureFull.SetActive(true);
+                score_ui = int.Parse(score_t);
+                score_ui = score_ui + 100;
+                score_gained.text = score_ui.ToString();
+                feedback_text.text = "Well done mate! You gained 100 coins!! Keep it up!";
+                UsefulFunctions.tot_score = score_gained;
+                GemsCollection.feedbackInfo.color = "Green";
             }
-            else if (distance <= 60f && distance >= 40f)
+            else if (d < 75 && d >= 25)
             {
-                barPercentage = 50;
+                treasureMedium.SetActive(true);
+                score_ui = int.Parse(score_t);
+                score_ui = score_ui + 50;
+                score_gained.text = score_ui.ToString();
+                feedback_text.text = "Almost there mate! 50 coins for you!";
+                UsefulFunctions.tot_score = score_gained;
+                GemsCollection.feedbackInfo.color = "Yellow";
             }
-            else
+            else if (d >= 100)
             {
-                barPercentage = 30;
+                treasureEmpty.SetActive(true);
+                score_ui = int.Parse(score_t);
+                score_ui = score_ui + 0;
+                score_gained.text = score_ui.ToString();
+                feedback_text.text = "Better luck next time, mate!";
+                UsefulFunctions.tot_score = score_gained;
+                GemsCollection.feedbackInfo.color = "Red";
             }
         }
-        else
-        {
-            error = 25;
-            barPercentage = 25;
-        }
-        /*
-        if(distance <= 25) {
-            error = 25;
-        }
-        else if (distance < 75) {
-            error = 75;
-        }
-        else
-        {
-            error = 100;
-        }*/
+        EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(GameObject.FindGameObjectWithTag("FeedbackContinue"));
+    }
+    
+
+    public void onQuitClick()
+    {
+        Application.Quit();
     }
 
-    void FeedbackTextVisualization()
+    public void onContinueClick()
     {
-        points_given = true;
-        string score_t;
-        if(score_gained.text != string.Empty)
-        {
-            score_t = score_gained.text;
-        }
-        else
-        {
-            score_t = "0";
-        }
-        if (error == 100)
-        {
-            score_ui = int.Parse(score_t);
-            score_ui = score_ui + 0;
-            score_gained.text = score_ui.ToString();
-            feedback_intro.SetActive(false);
-            fd.SetActive(true);
-            feedback_text.text = "Better luck next time, mate!";
-            GemsCollection.feedbackInfo.color = "Red";
-        }
-        else if (error == 75)
-        {
-            score_ui = int.Parse(score_t);
-            score_ui = score_ui + 50;
-            score_gained.text = score_ui.ToString();
-            feedback_intro.SetActive(false);
-            fd.SetActive(true);
-            feedback_text.text = "Almost there mate! 50 coins for you!";
-            GemsCollection.feedbackInfo.color = "Yellow";
-        }
-        else
-        {
-            score_ui = int.Parse(score_t);
-            score_ui = score_ui + 100;
-            score_gained.text = score_ui.ToString();
-            feedback_intro.SetActive(false);
-            fd.SetActive(true);
-            feedback_text.text = "Well done mate! You gained 100 coins!! Keep it up!";
-            GemsCollection.feedbackInfo.color = "Green";
-        }
+        UsefulFunctions.RndEnvironment();
     }
 
 }

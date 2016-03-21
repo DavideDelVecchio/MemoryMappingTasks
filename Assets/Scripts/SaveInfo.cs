@@ -41,7 +41,7 @@ public class SaveInfo : MonoBehaviour {
         UsefulFunctions.env1 = 0;
         UsefulFunctions.env2 = 0;
         UsefulFunctions.env3 = 0;
-        UsefulFunctions.RndEnvironment();
+        Application.LoadLevel(4);
     }
 
 

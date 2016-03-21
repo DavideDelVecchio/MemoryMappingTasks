@@ -111,6 +111,7 @@
     <Compile Include="Assets\OVR\Scripts\Util\OVRSceneSampleController.cs" />
     <Compile Include="Assets\OVR\Scripts\Util\OVRScreenFade.cs" />
     <Compile Include="Assets\OVR\Scripts\Util\OVRTrackerBounds.cs" />
+    <Compile Include="Assets\Scripts\ButtonScript.cs" />
     <Compile Include="Assets\Scripts\CompletePath.cs" />
     <Compile Include="Assets\Scripts\Demo.cs" />
     <Compile Include="Assets\Scripts\DistanceAndFeedBack.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Assets\Scripts\MenuStart.cs" />
     <Compile Include="Assets\Scripts\MouseLook.cs" />
     <Compile Include="Assets\Scripts\SaveInfo.cs" />
+    <Compile Include="Assets\Scripts\TestTrial.cs" />
     <Compile Include="Assets\Scripts\UsefulFunctions.cs" />
   </ItemGroup>
   <ItemGroup>

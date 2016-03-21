@@ -120,44 +120,15 @@ public class GemsCollection : MonoBehaviour {
     //Collision
     public void OnTriggerEnter(Collider col)
     {
-        //Debug.Log("Loaded level: " + Application.loadedLevel);
         AudioSource audio = player.GetComponent<AudioSource>();
         audio.Play();
         score++;
         gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
         UsefulFunctions.MainInfoSaving(collectObj);
-        /*
-        if (togo == 0)
-        {
-            countdown.color = Color.green;
-        }
-        else {
-            togo--;
-        }
-        countdown.text = togo.ToString();*/
         collision_t = trial_t;
-        /*
-        if (Application.loadedLevel == 3 || Application.loadedLevel == 4)
-        {
-            duration = 1.0f;
-            duration *= 0.5f;
-            if (duration <= 0)
-            {
-                duration = Time.deltaTime / 2;
-            }
-            StartCoroutine(WaitForIt(duration));
-            UsefulFunctions.RndJustPlayer(player);
-            //Increase the mapping trial counter
-            UsefulFunctions.mappingTrials++;
-        }*/
         collectObj.SetActive(false);
         if (score != menu_score)
             collectObj = UsefulFunctions.ChooseGem();
-        /*
-        collectObj = gems[current_gem];
-        UsefulFunctions.RandomizeObjPosition(collectObj);
-        //Increase the path integration trial counter
-        UsefulFunctions.pathTrials++;*/
     }
 
 

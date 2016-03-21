@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
@@ -9,12 +10,14 @@ using System.Collections;
 
 public class UsefulFunctions : MonoBehaviour {
     public static GameObject[] gems,totems,invisibleBorders,islandItems,palms,woods,waves,fence;
+    public static GameObject treasure;
     public static List<Vector3> envItems = new List<Vector3>();
     public static List<int> levels = new List<int> {1,2,3}; //up to 5 if we add two more levels
     public static int tot_trials = 30;
     public static int current_level,current_trial = 0;
     public static int max_repetition_env = 5;
     public static int env1, env2, env3 = 0;
+    public static Text tot_score;
     public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
     public static CompletePath.PathMapping objPath;// = new PlayerInfo.PathMapping();
     
@@ -34,9 +37,9 @@ public class UsefulFunctions : MonoBehaviour {
             GemsCollection.trialInfo.Add(info);
             info = new MainTrialInfo.InfoTrial();
             info.ID = "Treasure Position";
-            info.s_x = GameObject.FindGameObjectWithTag("Treasure").transform.position.x;
-            info.s_y = GameObject.FindGameObjectWithTag("Treasure").transform.position.y;
-            info.s_z = GameObject.FindGameObjectWithTag("Treasure").transform.position.z;
+            info.s_x = treasure.transform.position.x;
+            info.s_y = treasure.transform.position.y;
+            info.s_z = treasure.transform.position.z;
             info.time = GemsCollection.trial_t;
             info.score = GemsCollection.score;
             GemsCollection.trialInfo.Add(info);
@@ -162,7 +165,9 @@ public class UsefulFunctions : MonoBehaviour {
         float x, z;
         bool checkPosition = true;
         string tag = obj.tag;
-        GameObject treasure = GameObject.FindGameObjectWithTag("Treasure");
+        if(treasure == null)
+            treasure = GameObject.FindGameObjectWithTag("Treasure");
+
         Vector3 distancePT = new Vector3(treasure.transform.position.x - obj.transform.position.x, 0, treasure.transform.position.z - obj.transform.position.z); //Distance between player and the treasure
         Vector3 oldTreasurePosition = treasure.transform.position;
         Vector3 oldPosition = obj.transform.position;
@@ -179,7 +184,7 @@ public class UsefulFunctions : MonoBehaviour {
         //in constrast if obj is the gem we need to add player position
         if (tag == "Player" || tag == "OculusPlayer")
         {
-            envItems.Add(GemsCollection.collectObj.transform.position);
+            //envItems.Add(Demo.collectObj.transform.position);
         }
         else
         {
@@ -305,7 +310,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else if (env1 == 5 && env2 ==5 && env3 == 5)
                 {
-                    Application.LoadLevel(6);
+                    Application.LoadLevel(7);
                 }
                 break;
             case 1:
@@ -327,7 +332,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else if (env1 == 5 && env2 == 5 && env3 == 5)
                 {
-                    Application.LoadLevel(6);
+                    Application.LoadLevel(7);
                 }
                 break;
             case 2:
@@ -349,7 +354,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else if (env1 == 5 && env2 == 5 && env3 == 5)
                 {
-                    Application.LoadLevel(6);
+                    Application.LoadLevel(7);
                 }
                 break;
             case 3:
@@ -371,7 +376,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else if (env1 == 5 && env2 == 5 && env3 == 5)
                 {
-                    Application.LoadLevel(6);
+                    Application.LoadLevel(7);
                 }
                 break;
             case 4:
@@ -393,7 +398,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else if (env1 == 5 && env2 == 5 && env3 == 5)
                 {
-                    Application.LoadLevel(6);
+                    Application.LoadLevel(7);
                 }
                 break;
             case 5:
@@ -415,7 +420,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else if (env1 == 5 && env2 == 5 && env3 == 5)
                 {
-                    Application.LoadLevel(6);
+                    Application.LoadLevel(7);
                 }
                 break;
         }
