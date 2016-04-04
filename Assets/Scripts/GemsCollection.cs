@@ -59,7 +59,7 @@ public class GemsCollection : MonoBehaviour {
             gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
             score_gained.text = "0";
             //Randomize gem
-            collectObj = UsefulFunctions.ChooseGem(); 
+            collectObj = UsefulFunctions.ChooseGem(collectObj); 
             UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
             UsefulFunctions.MainInfoSaving(player); //Saves player and treasure position
             //Define file location
@@ -128,7 +128,7 @@ public class GemsCollection : MonoBehaviour {
         collision_t = trial_t;
         collectObj.SetActive(false);
         if (score != menu_score)
-            collectObj = UsefulFunctions.ChooseGem();
+            collectObj = UsefulFunctions.ChooseGem(collectObj);
     }
 
 

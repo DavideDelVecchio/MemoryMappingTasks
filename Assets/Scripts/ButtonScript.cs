@@ -70,6 +70,16 @@ public class ButtonScript : MonoBehaviour {
         treasure.GetComponent<Animator>().enabled = true;
     }
 
+    public void ContinueExp()
+    {
+        UsefulFunctions.RndEnvironment();
+    }
+
+    public void QuitExp()
+    {
+        Application.LoadLevel(7);
+    }
+
 
 
 }

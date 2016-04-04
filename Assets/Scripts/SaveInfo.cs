@@ -38,6 +38,7 @@ public class SaveInfo : MonoBehaviour {
         }
 
         PlayerPrefs.SetInt("EnvOrder", env_order.value);
+        PlayerPrefs.SetString("Score", "0");
         UsefulFunctions.env1 = 0;
         UsefulFunctions.env2 = 0;
         UsefulFunctions.env3 = 0;

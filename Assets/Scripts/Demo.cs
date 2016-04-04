@@ -6,16 +6,18 @@ using System.Linq;
 
 public class Demo : MonoBehaviour {
 
-    public GameObject player, oculus_player, treasure, instruction_menu;
+    public GameObject player, oculus_player, treasure,feedbackEndTrial,tornado;
     int menu_score, score_ui;
-    int score = 0;
+    int dummy = 0;
+    public static int score = 0;
     string _FileLocation, _data, subName;
-    bool isSaving;
+    bool isSaving, startTrial,showFeedback,tilted;
     public Text score_gained, gems_info;
     public static GameObject collectObj;
     public static Vector3 goal_position, last_position;
     public static float pause_t, trial_t, collision_t, distance = 0.0f;
     public static string _FileName, score_text = "";
+    public static DistanceAndFeedBack.FeedbackInfo feedbackInfo;
     public static List<MainTrialInfo.InfoTrial> trialInfo = new List<MainTrialInfo.InfoTrial>();
     public static List<CompletePath.PathMapping> trialPath = new List<CompletePath.PathMapping>();
     public static List<DistanceAndFeedBack.FeedbackInfo> trialFeedback = new List<DistanceAndFeedBack.FeedbackInfo>();
@@ -23,7 +25,12 @@ public class Demo : MonoBehaviour {
     //Called before any other function
     void Awake()
     {
+        //If reloads the trial, reinitialize the variables
+        if (UsefulFunctions.current_trial > 0)
+            ReinitializeVariables();
         //Increase trial counter
+        UsefulFunctions.old_trial = UsefulFunctions.current_trial;
+        UsefulFunctions.sameTrial = false;
         UsefulFunctions.current_trial++;
         //If status is ok activates the right player GameObject, checking if Oculus toggle was on or off
         switch (PlayerPrefs.GetInt("Oculus"))
@@ -32,6 +39,7 @@ public class Demo : MonoBehaviour {
             case 0:
                 player.SetActive(true);
                 oculus_player.SetActive(false);
+                player.GetComponent<MouseLook>().enabled = false;
                 Debug.Log("Activate player prefab");
                 break;
             //Oculus case
@@ -42,7 +50,7 @@ public class Demo : MonoBehaviour {
                 break;
         }
         //Randomize gem position and assign it to the variable
-        collectObj = UsefulFunctions.ChooseGem();
+        collectObj = UsefulFunctions.ChooseGem(collectObj);
         //Randomize Player and Treasure position
         UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
         UsefulFunctions.MainInfoSaving(player); //Saves player and treasure position
@@ -50,15 +58,17 @@ public class Demo : MonoBehaviour {
         menu_score = Random.Range(1, 3);
         //Update score and gems UI
         gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
-        if(score_gained.text == string.Empty)
+        if (UsefulFunctions.current_trial == 0 || UsefulFunctions.current_trial == 1)
         {
             score_gained.text = "0";
         }
-        else
-        {
-            score_gained = UsefulFunctions.tot_score;
+        else {
+            score_gained.text = PlayerPrefs.GetString("Score");
         }
-        treasure.GetComponent<Animator>().Stop();
+        startTrial = true;
+        showFeedback = false;
+        tilted = false;
+        feedbackEndTrial.SetActive(false);
     }
 
     // Use this for initialization
@@ -71,12 +81,13 @@ public class Demo : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate ()
     {
         trial_t += Time.deltaTime; //updates time
         UsefulFunctions.PathTracing(player);
         if (score == menu_score)
         {
+            feedbackEndTrial.GetComponent<Animator>().SetBool("hasToGoBack", showFeedback);
             if (UsefulFunctions.OnButtonPression() == true)
             {
                 score_text = score_gained.text;
@@ -102,7 +113,20 @@ public class Demo : MonoBehaviour {
                 {
                     isSaving = false;
                 }
+                Application.LoadLevel(6); //Load feedback
             }
+        }
+        if(startTrial)
+        {
+            if (dummy == 80)
+            {
+                treasure.SetActive(false);
+                tilted = true;
+                player.GetComponent<MouseLook>().enabled = true;
+                startTrial = false;
+                player.GetComponent<Animator>().SetBool("Tilted", tilted);
+            }
+            dummy++;
         }
     }
 
@@ -117,7 +141,29 @@ public class Demo : MonoBehaviour {
         collision_t = trial_t;
         collectObj.SetActive(false);
         if (score != menu_score)
-            collectObj = UsefulFunctions.ChooseGem();
+        {
+            collectObj = UsefulFunctions.ChooseGem(collectObj);
+        }
+        else
+        {
+            
+            feedbackEndTrial.SetActive(true);
+            showFeedback = true;
+        }
+    }
+
+    //Reinitializes variables in the scene for new trial
+    public void ReinitializeVariables()
+    {
+        trial_t = 0.0f;
+        collision_t = 0.0f;
+        dummy = 0;
+        score = 0;
+        menu_score = 0;
+        _data = null;
+        trialInfo.Clear();
+        trialPath.Clear();
+        Debug.Log("Variables reinitialized.");
     }
 
 }

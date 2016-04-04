@@ -7,9 +7,9 @@ using System.Collections;
 public class Feedback : MonoBehaviour
 {
 
-    public GameObject startTrialMenu,feedbackMenu,firstTime,quitButton,nextButton,treasureFull,treasureMedium,treasureEmpty;
+    public GameObject startTrialMenu,feedbackMenu, scoreMenu,firstTime,quitButton,nextButton,treasureFull,treasureMedium,treasureEmpty, gems_collect,gems_panel;
     public Text score_gained, feedback_text;
-    public int d,error, score_ui;
+    public int d,error, score_ui,tot_score;
     
     void Awake()
     {
@@ -17,18 +17,30 @@ public class Feedback : MonoBehaviour
         {
             startTrialMenu.SetActive(true);
             feedbackMenu.SetActive(false);
+            scoreMenu.SetActive(false);
+        }
+        else if (UsefulFunctions.current_trial == 15)
+        {
+            gems_panel.SetActive(false);
+            gems_collect.SetActive(false);
+            feedbackMenu.SetActive(false);
+            startTrialMenu.SetActive(false);
+
         }
         else
         {
             startTrialMenu.SetActive(false);
             feedbackMenu.SetActive(true);
+            gems_panel.SetActive(false);
+            gems_collect.SetActive(false);
         }
 
     }
     
     void Start()
     {
-        FeedbackVisualization();
+        if(UsefulFunctions.current_trial != 0)
+            FeedbackVisualization();
     }
 
     public void FeedbackVisualization()
@@ -37,15 +49,15 @@ public class Feedback : MonoBehaviour
         if (!startTrialMenu.activeSelf)
         {
             
-            GemsCollection.feedbackInfo = new DistanceAndFeedBack.FeedbackInfo();
-            GemsCollection.feedbackInfo.ID = PlayerPrefs.GetString("SubjID") + UsefulFunctions.current_trial;
-            GemsCollection.feedbackInfo.g_x = GemsCollection.goal_position.x;
-            GemsCollection.feedbackInfo.g_y = GemsCollection.goal_position.y;
-            GemsCollection.feedbackInfo.g_z = GemsCollection.goal_position.z;
-            GemsCollection.feedbackInfo.e_x = GemsCollection.last_position.x;
-            GemsCollection.feedbackInfo.e_y = GemsCollection.last_position.y;
-            GemsCollection.feedbackInfo.e_z = GemsCollection.last_position.z;
-            GemsCollection.feedbackInfo.distance = GemsCollection.distance;
+            Demo.feedbackInfo = new DistanceAndFeedBack.FeedbackInfo();
+            Demo.feedbackInfo.ID = PlayerPrefs.GetString("SubjID") + UsefulFunctions.current_trial;
+            Demo.feedbackInfo.g_x = Demo.goal_position.x;
+            Demo.feedbackInfo.g_y = Demo.goal_position.y;
+            Demo.feedbackInfo.g_z = Demo.goal_position.z;
+            Demo.feedbackInfo.e_x = Demo.last_position.x;
+            Demo.feedbackInfo.e_y = Demo.last_position.y;
+            Demo.feedbackInfo.e_z = Demo.last_position.z;
+            Demo.feedbackInfo.distance = Demo.distance;
 
             d = (int)Demo.distance;
             string score_t;
@@ -65,8 +77,10 @@ public class Feedback : MonoBehaviour
                 score_ui = score_ui + 100;
                 score_gained.text = score_ui.ToString();
                 feedback_text.text = "Well done mate! You gained 100 coins!! Keep it up!";
-                UsefulFunctions.tot_score = score_gained;
-                GemsCollection.feedbackInfo.color = "Green";
+                tot_score = int.Parse(PlayerPrefs.GetString("Score"));
+                tot_score = tot_score + score_ui;
+                PlayerPrefs.SetString("Score", tot_score.ToString());
+                Demo.feedbackInfo.color = "Green";
             }
             else if (d < 75 && d >= 25)
             {
@@ -75,8 +89,10 @@ public class Feedback : MonoBehaviour
                 score_ui = score_ui + 50;
                 score_gained.text = score_ui.ToString();
                 feedback_text.text = "Almost there mate! 50 coins for you!";
-                UsefulFunctions.tot_score = score_gained;
-                GemsCollection.feedbackInfo.color = "Yellow";
+                tot_score = int.Parse(PlayerPrefs.GetString("Score"));
+                tot_score = tot_score + score_ui;
+                PlayerPrefs.SetString("Score", tot_score.ToString());
+                Demo.feedbackInfo.color = "Yellow";
             }
             else if (d >= 100)
             {
@@ -85,8 +101,10 @@ public class Feedback : MonoBehaviour
                 score_ui = score_ui + 0;
                 score_gained.text = score_ui.ToString();
                 feedback_text.text = "Better luck next time, mate!";
-                UsefulFunctions.tot_score = score_gained;
-                GemsCollection.feedbackInfo.color = "Red";
+                tot_score = int.Parse(PlayerPrefs.GetString("Score"));
+                tot_score = tot_score + score_ui;
+                PlayerPrefs.SetString("Score", tot_score.ToString());
+                Demo.feedbackInfo.color = "Red";
             }
         }
         EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(GameObject.FindGameObjectWithTag("FeedbackContinue"));
@@ -95,7 +113,7 @@ public class Feedback : MonoBehaviour
 
     public void onQuitClick()
     {
-        Application.Quit();
+        Application.LoadLevel(7);
     }
 
     public void onContinueClick()

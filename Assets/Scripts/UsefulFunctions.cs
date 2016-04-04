@@ -12,12 +12,11 @@ public class UsefulFunctions : MonoBehaviour {
     public static GameObject[] gems,totems,invisibleBorders,islandItems,palms,woods,waves,fence;
     public static GameObject treasure;
     public static List<Vector3> envItems = new List<Vector3>();
-    public static List<int> levels = new List<int> {1,2,3}; //up to 5 if we add two more levels
     public static int tot_trials = 30;
-    public static int current_level,current_trial = 0;
+    public static int old_trial, current_trial = 0;
     public static int max_repetition_env = 5;
     public static int env1, env2, env3 = 0;
-    public static Text tot_score;
+    public static bool sameTrial = false;
     public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
     public static CompletePath.PathMapping objPath;// = new PlayerInfo.PathMapping();
     
@@ -25,24 +24,24 @@ public class UsefulFunctions : MonoBehaviour {
     //Main Trial information saving
     public static void MainInfoSaving(GameObject obj)
     {
-        if ((obj.tag == "Player" && GemsCollection.collision_t == 0) || (obj.tag == "OculusPlayer" && GemsCollection.collision_t == 0))
+        if ((obj.tag == "Player" && Demo.collision_t == 0) || (obj.tag == "OculusPlayer" && Demo.collision_t == 0))
         {
             info = new MainTrialInfo.InfoTrial();
             info.ID = "Start Position Player";
             info.s_x = obj.transform.position.x;
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
-            info.time = GemsCollection.trial_t;
-            info.score = GemsCollection.score;
-            GemsCollection.trialInfo.Add(info);
+            info.time = Demo.trial_t;
+            info.score = Demo.score;
+            Demo.trialInfo.Add(info);
             info = new MainTrialInfo.InfoTrial();
             info.ID = "Treasure Position";
             info.s_x = treasure.transform.position.x;
             info.s_y = treasure.transform.position.y;
             info.s_z = treasure.transform.position.z;
-            info.time = GemsCollection.trial_t;
-            info.score = GemsCollection.score;
-            GemsCollection.trialInfo.Add(info);
+            info.time = Demo.trial_t;
+            info.score = Demo.score;
+            Demo.trialInfo.Add(info);
 
         }
         else if (obj.tag == "Gems")
@@ -52,9 +51,9 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_x = obj.transform.position.x;
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
-            info.time = GemsCollection.trial_t;
-            info.score = GemsCollection.score;
-            GemsCollection.trialInfo.Add(info);
+            info.time = Demo.trial_t;
+            info.score = Demo.score;
+            Demo.trialInfo.Add(info);
         }
         else
         {
@@ -63,10 +62,10 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_x = obj.transform.position.x;
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
-            info.time = GemsCollection.trial_t;
-            info.score = GemsCollection.score;
-            info.d = Vector3.Distance(GemsCollection.goal_position, GemsCollection.last_position);
-            GemsCollection.trialInfo.Add(info);
+            info.time = Demo.trial_t;
+            info.score = Demo.score;
+            info.d = Vector3.Distance(Demo.goal_position, Demo.last_position);
+            Demo.trialInfo.Add(info);
         }
     }
 
@@ -76,8 +75,8 @@ public class UsefulFunctions : MonoBehaviour {
         Vector3 current_position = obj.transform.position;
         Vector3 current_rotation = obj.transform.rotation.eulerAngles;
         objPath = new CompletePath.PathMapping();
-        int k = GemsCollection.trialPath.Count;
-        if (k == 0 || GemsCollection.trialPath[k - 1].s_x != current_position.x && GemsCollection.trialPath[k - 1].s_z != current_position.z)
+        int k = Demo.trialPath.Count;
+        if (k == 0 || Demo.trialPath[k - 1].s_x != current_position.x && Demo.trialPath[k - 1].s_z != current_position.z)
         {
             objPath.s_x = current_position.x;
             objPath.s_y = current_position.y;
@@ -85,8 +84,8 @@ public class UsefulFunctions : MonoBehaviour {
             objPath.r_x = current_rotation.x;
             objPath.r_y = current_rotation.y;
             objPath.r_z = current_rotation.z;
-            objPath.t = GemsCollection.trial_t;
-            GemsCollection.trialPath.Add(objPath);
+            objPath.t = Demo.trial_t;
+            Demo.trialPath.Add(objPath);
         }
     }
 
@@ -233,17 +232,39 @@ public class UsefulFunctions : MonoBehaviour {
     }
 
     //Choose which gem to show
-    public static GameObject ChooseGem()
+    public static GameObject ChooseGem(GameObject current_gem)
     {
-        if (gems == null)
+        int index_current_gem = 4;
+        if (gems == null || (current_trial != old_trial && !sameTrial))
         {
             gems = GameObject.FindGameObjectsWithTag("Gems");
+            sameTrial = true;
+        }
+        else
+        {
+            sameTrial = false;
         }
         int i = Random.Range(0, 3);
-        while(GemsCollection.collectObj == gems[i])
+        if(current_gem != null)
         {
-            i = Random.Range(0, 3);
+            for (int k = 0; k < gems.Length; k++)
+            {
+                if (gems[k] == current_gem)
+                {
+                    index_current_gem = k;
+                    break;
+                }
+            }
+            while (index_current_gem == i)
+            {
+                i = Random.Range(0, 3);
+            }
         }
+        else
+        {
+            current_gem = gems[i];
+        }
+        
         switch (i)
         {
             case 0:
@@ -424,85 +445,6 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 break;
         }
-
-        //Debug.Log(env);
-
-
-
-
-
-        //Application.LoadLevel(2);
-        //return 2;
-        /*
-        if (levels.Count != 0)
-        {
-            int l = Random.Range(0, levels.Count); //to 4 if we consider 2 more environments
-            switch (l)
-            {
-                case 0:
-                    //Level 1: Distal cues only
-                    if (tot_env1 != 30)
-                    {
-                        Application.LoadLevel(1);
-                        break;
-                    }
-                    else if (tot_trials == 90)
-                    {
-                        Application.LoadLevel(4); //End scene
-                    }
-                    break;
-                case 1:
-                    //Level 2: Distal cues & Boundaries
-                    if (tot_env2 != 30)
-                    {
-                        Application.LoadLevel(2);
-                        break;
-                    }
-                    else if (tot_trials == 90)
-                    {
-                        Application.LoadLevel(4); //End scene
-                    }
-                    break;
-                case 2:
-                    //Level 3: Distal cues & Local Landmarks
-                    if (tot_env3 != 30)
-                    {
-                        Application.LoadLevel(3);
-                        break;
-                    }
-                    else if (tot_trials == 90)
-                    {
-                        Application.LoadLevel(4); //End scene
-                    }
-                    break;
-            }
-            return l+1;
-        }
-        else {
-            if (tot_trials == 90)
-            {
-                bool isSaving;
-                string _data;
-                string _FileLocation = Application.dataPath + "/SubTrialInfo";
-                try
-                {
-                    isSaving = true;
-                    _data = SerializeObject(GemsCollection.trialFeedback);
-                    UsefulFunctions.CreateXML(_FileLocation, _data);
-                    Debug.Log("Main trial data Saved");
-                    }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError(ex.ToString());
-                }
-                finally
-                {
-                    isSaving = false;
-                }
-                Application.LoadLevel(4); //End scene
-            }
-            return 4;
-        } */
     }
 
 
@@ -511,77 +453,28 @@ public class UsefulFunctions : MonoBehaviour {
         if(current_trial == 15)
         {
             //Break point
+            env1 = 0;
+            env2 = 0;
+            env3 = 0;
             Application.LoadLevel(5);
         }
         else if (current_trial == tot_trials)
         {
+            string _data,_FileLocation;
+            _FileLocation = Application.dataPath + "/SubTrialInfo";
             //End experiment
-            Application.LoadLevel(6);
+            try
+            {
+                _data = SerializeObject(Demo.trialFeedback);
+                CreateXML(_FileLocation, _data);
+                Debug.Log("Feedback data Saved");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError(ex.ToString());
+            }
+            Application.LoadLevel(7);
         }
-    }
-
-
-    //Checks if the block is concluded
-    public static int CheckEnvState(int e)
-    {
-        /*
-        int isEnvReachedLimit = 2; //0 when is not, 1 when it has reached 30 trials
-        switch (e)
-        {
-            case 0:
-                if (tot_env1 == 30)
-                {
-                    levels.Remove(1);
-                    //Reset to zero obj counters
-                    nobj1 = 0;
-                    nobj2 = 0;
-                    nobj3 = 0;
-                    isEnvReachedLimit = 1;
-                    break;
-                }
-                else {
-                    tot_env1++;
-                    isEnvReachedLimit = 0;
-                    GemsCollection.currentEnv = 0;
-                }
-                break;
-            case 1:
-                if (tot_env2 == 30)
-                {
-                    levels.Remove(2);
-                    //Reset to zero obj counters
-                    nobj1 = 0;
-                    nobj2 = 0;
-                    nobj3 = 0;
-                    isEnvReachedLimit = 1;
-                    break;
-                }
-                else
-                {
-                    tot_env2++;
-                    isEnvReachedLimit = 0;
-                }
-                break;
-            case 2:
-                if (tot_env3 == 30)
-                {
-                    levels.Remove(3);
-                    //Reset to zero obj counters
-                    nobj1 = 0;
-                    nobj2 = 0;
-                    nobj3 = 0;
-                    isEnvReachedLimit = 1;
-                    break;
-                }
-                else
-                {
-                    tot_env3++;
-                    isEnvReachedLimit = 0;
-                }
-                break;
-        }
-        return isEnvReachedLimit; */
-        return 0;
     }
 
     //Checks if a button is pressed
@@ -648,17 +541,17 @@ public class UsefulFunctions : MonoBehaviour {
         if (pObject.GetType() == typeof(List<MainTrialInfo.InfoTrial>))
         {
             xs = new XmlSerializer(typeof(List<MainTrialInfo.InfoTrial>));
-            GemsCollection._FileName = PlayerPrefs.GetString("SubjID") + "_MainTrialInfo" + current_trial + ".xml";
+            Demo._FileName = PlayerPrefs.GetString("SubjID") + "_MainTrialInfo" + current_trial + ".xml";
         }
         else if (pObject.GetType() == typeof(List<CompletePath.PathMapping>))
         {
             xs = new XmlSerializer(typeof(List<CompletePath.PathMapping>));
-            GemsCollection._FileName = PlayerPrefs.GetString("SubjID") + "_CompleteTrialPath" + current_trial + ".xml";
+            Demo._FileName = PlayerPrefs.GetString("SubjID") + "_CompleteTrialPath" + current_trial + ".xml";
         }
         else
         {
             xs = new XmlSerializer(typeof(List<DistanceAndFeedBack.FeedbackInfo>));
-            GemsCollection._FileName = PlayerPrefs.GetString("SubjID") + "_FeedbackTrials" + ".xml";
+            Demo._FileName = PlayerPrefs.GetString("SubjID") + "_FeedbackTrials" + ".xml";
         }
         XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
         xmlTextWriter.Formatting = Formatting.Indented;
@@ -672,7 +565,7 @@ public class UsefulFunctions : MonoBehaviour {
     public static void CreateXML(string _FileLocation, string _data)
     {
         StreamWriter writer;
-        FileInfo t = new FileInfo(_FileLocation + "/" + GemsCollection._FileName);
+        FileInfo t = new FileInfo(_FileLocation + "/" + Demo._FileName);
         if (!t.Exists)
         {
             writer = t.CreateText();
