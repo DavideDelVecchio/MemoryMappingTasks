@@ -8,7 +8,7 @@ public class TestTrial : MonoBehaviour
 {
 
     public GameObject player, oculus_player, treasure, instruction_menu, feedbackEndTrial,tornadoFeedback, tornado;
-    public GameObject[] tornados;
+    public GameObject[] tornados,gems;
     int menu_score, score_ui;
     int score, dummy = 0;
     bool showFeedback, tilted,startRot = false;
@@ -23,30 +23,18 @@ public class TestTrial : MonoBehaviour
     void Awake()
     {
         UsefulFunctions.old_trial = UsefulFunctions.current_trial;
-        //If status is ok activates the right player GameObject, checking if Oculus toggle was on or off
-        switch (PlayerPrefs.GetInt("Oculus"))//PlayerPrefs.GetInt("Oculus")
-        {
-            //Default case
-            case 0:
-                player.SetActive(true);
-                oculus_player.SetActive(false);
-                player.GetComponent<CharacterController>().enabled = false;
-                player.GetComponent<MouseLook>().enabled = false;
-                Debug.Log("Activate player prefab");
-                break;
-            //Oculus case
-            case 1:
-                //player.SetActive(false);
-                oculus_player.SetActive(true);
-                Debug.Log("Activate Oculus OVR Player");
-                break;
-        }
+        //Player settings
+        player.SetActive(true);
+        player.GetComponent<CharacterController>().enabled = false;
+        player.GetComponent<MouseLook>().enabled = false;
+        Debug.Log("Activate player prefab");
         //Randomize gem position and assign it to the variable
-        collectObj = UsefulFunctions.ChooseGem(collectObj);
+        collectObj = UsefulFunctions.ChooseGem(gems);
         //Randomize Player and Treasure position
         UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
         //Randomize number of collectable obj
-        menu_score = 3;
+        menu_score = 2;
+        UsefulFunctions.previous_gem_number = 2;
         //Update score and gems UI
         gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
         score_gained.text = "0";
@@ -77,7 +65,7 @@ public class TestTrial : MonoBehaviour
             if (UsefulFunctions.OnButtonPression() == true)
             {
                 score_text = score_gained.text;
-                Application.LoadLevel(6); //Feedback level
+                Application.LoadLevel(5); //Feedback level
             }
         }
         if (treasure.GetComponent<Animator>().isActiveAndEnabled)
@@ -110,18 +98,24 @@ public class TestTrial : MonoBehaviour
         collectObj.SetActive(false);
         if (score != menu_score)
         {
-            collectObj = UsefulFunctions.ChooseGem(collectObj);
+            collectObj = UsefulFunctions.ChooseGem(gems);
         }
         else
         {
-            player.GetComponent<CharacterController>().enabled = false;
-            tornado.SetActive(true);
-            foreach (GameObject g in tornados)
-                g.SetActive(true);
-            tornadoFeedback.SetActive(true);
-            StartCoroutine(WaitForIt(5f));
-            //feedbackEndTrial.SetActive(true);
-            //showFeedback = true;
+            if(PlayerPrefs.GetInt("isMapping") == 1)
+            {
+                player.GetComponent<CharacterController>().enabled = false;
+                tornado.SetActive(true);
+                foreach (GameObject g in tornados)
+                    g.SetActive(true);
+                tornadoFeedback.SetActive(true);
+                StartCoroutine(WaitForIt(5f));
+            }
+            else
+            {
+                feedbackEndTrial.SetActive(true);
+                showFeedback = true;
+            }
         }
     }
 
@@ -134,7 +128,12 @@ public class TestTrial : MonoBehaviour
         tornadoFeedback.SetActive(false);
         tornado.SetActive(false);
         foreach (GameObject g in tornados)
-            g.SetActive(false);  
+        {
+            g.SetActive(false);
+        }
+        feedbackEndTrial.SetActive(true);
+        showFeedback = true;
+        player.GetComponent<CharacterController>().enabled = true;
     }
 
 }

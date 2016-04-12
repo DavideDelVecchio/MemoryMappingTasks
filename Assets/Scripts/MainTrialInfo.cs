@@ -17,7 +17,7 @@ public class MainTrialInfo : ISerializable
         public float s_z;
         public float time;
         public float d;
-        public int score;
+        public string score;
 
         public InfoTrial() {
             ID = string.Empty;
@@ -26,7 +26,7 @@ public class MainTrialInfo : ISerializable
             s_z = 0;
             time = 0;
             d = 0;
-            score = 0;
+            score = "0";
         }
 
            

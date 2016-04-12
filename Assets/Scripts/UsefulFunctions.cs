@@ -12,11 +12,11 @@ public class UsefulFunctions : MonoBehaviour {
     public static GameObject[] gems,totems,invisibleBorders,islandItems,palms,woods,waves,fence;
     public static GameObject treasure;
     public static List<Vector3> envItems = new List<Vector3>();
-    public static int tot_trials = 30;
+    public static int current_gem_number, previous_gem_number;
+    public static int tot_trials = 60;
     public static int old_trial, current_trial = 0;
-    public static int max_repetition_env = 5;
     public static int env1, env2, env3 = 0;
-    public static bool sameTrial = false;
+    public static bool sameTrial, endBlock = false;
     public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
     public static CompletePath.PathMapping objPath;// = new PlayerInfo.PathMapping();
     
@@ -24,7 +24,7 @@ public class UsefulFunctions : MonoBehaviour {
     //Main Trial information saving
     public static void MainInfoSaving(GameObject obj)
     {
-        if ((obj.tag == "Player" && Demo.collision_t == 0) || (obj.tag == "OculusPlayer" && Demo.collision_t == 0))
+        if ((obj.tag == "Player" && Demo.collision_t == 0))
         {
             info = new MainTrialInfo.InfoTrial();
             info.ID = "Start Position Player";
@@ -32,7 +32,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
             info.time = Demo.trial_t;
-            info.score = Demo.score;
+            info.score = PlayerPrefs.GetString("Score");
             Demo.trialInfo.Add(info);
             info = new MainTrialInfo.InfoTrial();
             info.ID = "Treasure Position";
@@ -40,7 +40,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = treasure.transform.position.y;
             info.s_z = treasure.transform.position.z;
             info.time = Demo.trial_t;
-            info.score = Demo.score;
+            info.score = PlayerPrefs.GetString("Score");
             Demo.trialInfo.Add(info);
 
         }
@@ -52,7 +52,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
             info.time = Demo.trial_t;
-            info.score = Demo.score;
+            info.score = PlayerPrefs.GetString("Score");
             Demo.trialInfo.Add(info);
         }
         else
@@ -63,7 +63,7 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
             info.time = Demo.trial_t;
-            info.score = Demo.score;
+            info.score = PlayerPrefs.GetString("Score");
             info.d = Vector3.Distance(Demo.goal_position, Demo.last_position);
             Demo.trialInfo.Add(info);
         }
@@ -163,6 +163,7 @@ public class UsefulFunctions : MonoBehaviour {
         //Variables
         float x, z;
         bool checkPosition = true;
+        float check_prev_pos = 0.0f;
         string tag = obj.tag;
         if(treasure == null)
             treasure = GameObject.FindGameObjectWithTag("Treasure");
@@ -181,40 +182,32 @@ public class UsefulFunctions : MonoBehaviour {
 
         //If the obj is the player we need to add the gem position
         //in constrast if obj is the gem we need to add player position
-        if (tag == "Player" || tag == "OculusPlayer")
+        if (tag == "Gems")
         {
-            //envItems.Add(Demo.collectObj.transform.position);
+            envItems.Add(GameObject.FindGameObjectWithTag("Player").transform.position);
         }
-        else
-        {
-            switch (PlayerPrefs.GetInt("Oculus"))
-            {
-                //Default case
-                case 0:
-                    envItems.Add(GameObject.FindGameObjectWithTag("Player").transform.position);
-                    break;
-                //Oculus case
-                case 1:
-                    envItems.Add(GameObject.FindGameObjectWithTag("OculusPlayer").transform.position);
-                    break;
-            }
-        }
-
         //Calculates new position
         while (checkPosition)
         {
-            x = Random.Range(413.071f, 863.15f);
-            z = Random.Range(528.554f, 828.4f);
-
+            x = Random.Range(400f, 701f);
+            float upOrDown = Random.Range(0, 2);
+            if (upOrDown == 0)
+            {
+                z = Random.Range(600f, 656f);
+            }
+            else
+            {
+                z = Random.Range(745f, 801f);
+            }
+            //z = Random.Range(600f, 800f);
             //Checks if the position is free
             Vector3 newPositionP = new Vector3(x, oldPosition.y, z);
-
             foreach (Vector3 v in envItems)
             {
                 if ((v.x != newPositionP.x && v.z != newPositionP.z) || (v.x != newPositionP.x && v.z == newPositionP.z) || (v.x == newPositionP.x && v.z != newPositionP.z))
                 {
                     obj.transform.position = newPositionP;
-                    if(tag == "Player"|| tag == "OculusPlayer")
+                    if (tag == "Player")
                     {
                         Vector3 newPositionT = new Vector3(newPositionP.x + distancePT.x, 0, newPositionP.z + distancePT.z);
                         treasure.transform.position = newPositionT;
@@ -228,69 +221,25 @@ public class UsefulFunctions : MonoBehaviour {
                     break;
                 }
             }
+            check_prev_pos = Vector3.Distance(newPositionP, Demo.goal_position);
+            Debug.Log("Player Pos Distance: " + check_prev_pos);
+            if (tag == "Player" && check_prev_pos < 100)
+            {
+                checkPosition = true;
+            }
         }
     }
 
     //Choose which gem to show
-    public static GameObject ChooseGem(GameObject current_gem)
+    public static GameObject ChooseGem(GameObject[] gems)
     {
-        int index_current_gem = 4;
-        if (gems == null || (current_trial != old_trial && !sameTrial))
+        int i = Random.Range(0, gems.Length);
+        foreach(GameObject g in gems)
         {
-            gems = GameObject.FindGameObjectsWithTag("Gems");
-            sameTrial = true;
-        }
-        else
-        {
-            sameTrial = false;
-        }
-        int i = Random.Range(0, 3);
-        if(current_gem != null)
-        {
-            for (int k = 0; k < gems.Length; k++)
-            {
-                if (gems[k] == current_gem)
-                {
-                    index_current_gem = k;
-                    break;
-                }
-            }
-            while (index_current_gem == i)
-            {
-                i = Random.Range(0, 3);
-            }
-        }
-        else
-        {
-            current_gem = gems[i];
-        }
-        
-        switch (i)
-        {
-            case 0:
-                gems[i].SetActive(true);
-                gems[i + 1].SetActive(false);
-                gems[i + 2].SetActive(false);
-                gems[i + 3].SetActive(false);
-                break;
-            case 1:
-                gems[i].SetActive(true);
-                gems[i - 1].SetActive(false);
-                gems[i + 1].SetActive(false);
-                gems[i + 2].SetActive(false);
-                break;
-            case 2:
-                gems[i].SetActive(true);
-                gems[i - 1].SetActive(false);
-                gems[i - 2].SetActive(false);
-                gems[i + 1].SetActive(false);
-                break;
-            case 3:
-                gems[i].SetActive(true);
-                gems[i - 3].SetActive(false);
-                gems[i - 2].SetActive(false);
-                gems[i - 1].SetActive(false);
-                break;
+            if (g == gems[i])
+                g.SetActive(true);
+            else
+                g.SetActive(false);
         }
         RndPositionObj(gems[i]);
         return gems[i];
@@ -306,142 +255,106 @@ public class UsefulFunctions : MonoBehaviour {
         //3: Distal Cues and Boundaries, Distal Cues and Landmarks, Distal Cues 2 3 1
         //4: Distal Cues and Landmarks, Distal Cues and Boundaries, Distal Cues 3 2 1
         //5: Distal Cues and Landmarks, Distal Cues, Distal cues and Boundaries 3 1 2
-        
+
         //Checks the experimental status and ends it if necessary 
         CheckExpStatus();
-        int env = PlayerPrefs.GetInt("EnvOrder");
+        int env;
+        if (current_trial <= 20)
+        {
+            env = 1;
+        }
+        else if (current_trial > 20 && current_trial <= 40)
+        {
+            env = 2;
+        }
+        else
+        {
+            env = 3;
+        }
+
         switch (env)
         {
-            case 0:
-                //Level 1, 2, 3
-                if(env1 < 5 && env2 == 0 && env3 == 0)
-                {
-                    env1++;
-                    Application.LoadLevel(1);
-                }
-                else if(env2 < 5 && env1 == 5 && env3 == 0)
-                {
-                    env2++;
-                    Application.LoadLevel(2);
-                }
-                else if (env3 < 5 && env1 == 5 && env2 == 5)
-                {
-                    env3++;
-                    Application.LoadLevel(3);
-                }
-                else if (env1 == 5 && env2 ==5 && env3 == 5)
-                {
-                    Application.LoadLevel(7);
-                }
-                break;
             case 1:
-                //Level 1 3 2
-                if (env1 < 5 && env2 == 0 && env3 == 0)
+                if(env1<=20)
                 {
+                    if(env1 == 10)
+                    {
+                        if(previous_gem_number == 1)
+                        {
+                            current_gem_number = previous_gem_number = 2;
+
+                        }
+                        else
+                        {
+                            current_gem_number = previous_gem_number = 1;
+                        }
+                    }
+                    else
+                    {
+                        current_gem_number = previous_gem_number;
+                    }
                     env1++;
                     Application.LoadLevel(1);
                 }
-                else if (env3 < 5 && env1 == 5 && env2 == 0)
+                else
                 {
-                    env3++;
-                    Application.LoadLevel(3);
-                }
-                else if (env2 < 5 && env1 == 5 && env3 == 5)
-                {
-                    env2++;
-                    Application.LoadLevel(2);
-                }
-                else if (env1 == 5 && env2 == 5 && env3 == 5)
-                {
-                    Application.LoadLevel(7);
+                    endBlock = true;
+                    Application.LoadLevel(5);
                 }
                 break;
             case 2:
-                //Level 2 1 3
-                if (env1 < 5 && env2 == 0 && env3 == 0)
+                if (env2 <= 20)
                 {
-                    env1++;
-                    Application.LoadLevel(1);
-                }
-                else if (env2 < 5 && env1 == 5 && env3 == 0)
-                {
+                    if (env2 == 10)
+                    {
+                        if (previous_gem_number == 1)
+                        {
+                            current_gem_number = previous_gem_number = 2;
+
+                        }
+                        else
+                        {
+                            current_gem_number = previous_gem_number = 1;
+                        }
+                    }
+                    else
+                    {
+                        current_gem_number = previous_gem_number;
+                    }
                     env2++;
                     Application.LoadLevel(2);
                 }
-                else if (env3 < 5 && env1 == 5 && env2 == 5)
+                else
                 {
-                    env3++;
-                    Application.LoadLevel(3);
-                }
-                else if (env1 == 5 && env2 == 5 && env3 == 5)
-                {
-                    Application.LoadLevel(7);
+                    endBlock = true;
+                    Application.LoadLevel(5);
                 }
                 break;
             case 3:
-                //Level 2 3 1
-                if (env2 < 5 && env1 == 0 && env3 == 0)
+                if (env3 <= 20)
                 {
-                    env2++;
-                    Application.LoadLevel(2);
-                }
-                else if (env3 < 5 && env2 == 5 && env1 == 0)
-                {
+                    if (env3 == 10)
+                    {
+                        if (previous_gem_number == 1)
+                        {
+                            current_gem_number = previous_gem_number = 2;
+
+                        }
+                        else
+                        {
+                            current_gem_number = previous_gem_number = 1;
+                        }
+                    }
+                    else
+                    {
+                        current_gem_number = previous_gem_number;
+                    }
                     env3++;
                     Application.LoadLevel(3);
                 }
-                else if (env1 < 5 && env2 == 5 && env3 == 5)
+                else
                 {
-                    env1++;
-                    Application.LoadLevel(1);
-                }
-                else if (env1 == 5 && env2 == 5 && env3 == 5)
-                {
-                    Application.LoadLevel(7);
-                }
-                break;
-            case 4:
-                //Level 3 2 1
-                if (env3 < 5 && env2 == 0 && env1 == 0)
-                {
-                    env3++;
-                    Application.LoadLevel(3);
-                }
-                else if (env2 < 5 && env3 == 5 && env1 == 0)
-                {
-                    env2++;
-                    Application.LoadLevel(2);
-                }
-                else if (env1 < 5 && env2 == 5 && env3 == 5)
-                {
-                    env1++;
-                    Application.LoadLevel(1);
-                }
-                else if (env1 == 5 && env2 == 5 && env3 == 5)
-                {
-                    Application.LoadLevel(7);
-                }
-                break;
-            case 5:
-                //Level 3 1 2
-                if (env3 < 5 && env1 == 0 && env1 == 0)
-                {
-                    env3++;
-                    Application.LoadLevel(3);
-                }
-                else if (env1 < 5 && env3 == 5 && env2 == 0)
-                {
-                    env1++;
-                    Application.LoadLevel(1);
-                }
-                else if (env2 < 5 && env1 == 5 && env3 == 5)
-                {
-                    env2++;
-                    Application.LoadLevel(2);
-                }
-                else if (env1 == 5 && env2 == 5 && env3 == 5)
-                {
-                    Application.LoadLevel(7);
+                    Application.LoadLevel(6); //End Scene
                 }
                 break;
         }
@@ -450,15 +363,7 @@ public class UsefulFunctions : MonoBehaviour {
 
     public static void CheckExpStatus()
     {
-        if(current_trial == 15)
-        {
-            //Break point
-            env1 = 0;
-            env2 = 0;
-            env3 = 0;
-            Application.LoadLevel(5);
-        }
-        else if (current_trial == tot_trials)
+        if(current_trial == tot_trials)
         {
             string _data,_FileLocation;
             _FileLocation = Application.dataPath + "/SubTrialInfo";
@@ -481,7 +386,7 @@ public class UsefulFunctions : MonoBehaviour {
     public static bool OnButtonPression()
     {
         bool check = false;
-        if ((GameObject.FindGameObjectWithTag("Player") != null) || (GameObject.FindGameObjectsWithTag("OculusPlayer") != null))
+        if (GameObject.FindGameObjectWithTag("Player") != null)
         {
             //Allows input from Xbox360 controller, generic controller and Mac users
             if (Input.GetButton("A") || Input.GetButton("OtherX") || Input.GetButton("MacX"))
@@ -501,7 +406,7 @@ public class UsefulFunctions : MonoBehaviour {
     {
         bool check = false;
 
-        if ((GameObject.FindGameObjectWithTag("Player") != null) || (GameObject.FindGameObjectsWithTag("OculusPlayer") != null))
+        if (GameObject.FindGameObjectWithTag("Player") != null)
         {
             //Allows input from Xbox360 controller, generic controller and Mac users
             if (Input.GetButton("BackButton") || Input.GetButton("BackButtonMac") || Input.GetButton("GenericBackButton"))
@@ -541,17 +446,39 @@ public class UsefulFunctions : MonoBehaviour {
         if (pObject.GetType() == typeof(List<MainTrialInfo.InfoTrial>))
         {
             xs = new XmlSerializer(typeof(List<MainTrialInfo.InfoTrial>));
-            Demo._FileName = PlayerPrefs.GetString("SubjID") + "_MainTrialInfo" + current_trial + ".xml";
+            if (PlayerPrefs.GetInt("isMapping") == 0)
+            {
+                Demo._FileName = PlayerPrefs.GetString("SubjID") + "_MainTrialInfo" + current_trial + ".xml";
+            }
+            else
+            {
+                Demo._FileName = PlayerPrefs.GetString("SubjID") + "_MainTrialInfo_Mapping" + current_trial + ".xml";
+            }
+
         }
         else if (pObject.GetType() == typeof(List<CompletePath.PathMapping>))
         {
             xs = new XmlSerializer(typeof(List<CompletePath.PathMapping>));
-            Demo._FileName = PlayerPrefs.GetString("SubjID") + "_CompleteTrialPath" + current_trial + ".xml";
+            if (PlayerPrefs.GetInt("isMapping") == 0)
+            {
+                Demo._FileName = PlayerPrefs.GetString("SubjID") + "_CompleteTrialPath" + current_trial + ".xml";
+            }
+            else
+            {
+                Demo._FileName = PlayerPrefs.GetString("SubjID") + "_CompleteTrialPath_Mapping" + current_trial + ".xml";
+            }
         }
         else
         {
             xs = new XmlSerializer(typeof(List<DistanceAndFeedBack.FeedbackInfo>));
-            Demo._FileName = PlayerPrefs.GetString("SubjID") + "_FeedbackTrials" + ".xml";
+            if (PlayerPrefs.GetInt("isMapping") == 0)
+            {
+                Demo._FileName = PlayerPrefs.GetString("SubjID") + "_FeedbackTrials" + ".xml";
+            }
+            else
+            {
+                Demo._FileName = PlayerPrefs.GetString("SubjID") + "_FeedbackTrials_Mapping" + ".xml";
+            }
         }
         XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
         xmlTextWriter.Formatting = Formatting.Indented;
@@ -581,41 +508,4 @@ public class UsefulFunctions : MonoBehaviour {
     }
 }
 
-
-/*
-if (waitForButton) {
-			yield return StartCoroutine (WaitForActionButton ());
-		}
-
-	public IEnumerator WaitForActionButton(){
-		bool hasPressedButton = false;
-		while(Input.GetAxis("Action Button") != 0f){
-			yield return 0;
-		}
-		while(!hasPressedButton){
-			if(Input.GetAxis("Action Button") == 1.0f){
-				hasPressedButton = true;
-			}
-			yield return 0;
-		}
-	}
-
-    public static bool nextButton()
-    {
-        bool check = false;
-
-        if ((GameObject.FindGameObjectWithTag("Player") != null) || (GameObject.FindGameObjectsWithTag("OculusPlayer") != null))
-        {
-            //Allows input from Xbox360 controller, generic controller and Mac users
-            if (Input.GetButton("Ok") || Input.GetButton("OkMac") || Input.GetButton("OkGeneric"))
-            {
-                check = true;
-            }
-        }
-        else {
-            check = false;
-        }
-        return check;
-
-    }*/
 

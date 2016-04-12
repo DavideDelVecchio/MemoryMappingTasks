@@ -7,6 +7,8 @@ public class ButtonScript : MonoBehaviour {
     public static int pageIndex = 0;
     public int dummy = 0;
     public GameObject page0,page1, page2,page3,page4,page5,page6,next,start,menu;
+    public string _FileLocation, _data;
+    bool isSaving;
 
     public void NextPage()
     {
@@ -77,9 +79,15 @@ public class ButtonScript : MonoBehaviour {
 
     public void QuitExp()
     {
-        Application.LoadLevel(7);
+
+        Application.LoadLevel(6);
     }
 
+    public void ResumeButton()
+    {
+        Time.timeScale = 1;
+        Demo.trial_t = Demo.pause_t;
+    }
 
 
 }

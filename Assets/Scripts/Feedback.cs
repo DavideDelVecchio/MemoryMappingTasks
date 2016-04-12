@@ -9,30 +9,22 @@ public class Feedback : MonoBehaviour
 
     public GameObject startTrialMenu,feedbackMenu, scoreMenu,firstTime,quitButton,nextButton,treasureFull,treasureMedium,treasureEmpty, gems_collect,gems_panel;
     public Text score_gained, feedback_text;
-    public int d,error, score_ui,tot_score;
+    public int d,error, score_ui,tot_score, cc;
+    public bool halfWayThroughIt = false;
     
     void Awake()
     {
+        cc = 0;
         if (UsefulFunctions.current_trial == 0)
         {
             startTrialMenu.SetActive(true);
             feedbackMenu.SetActive(false);
             scoreMenu.SetActive(false);
         }
-        else if (UsefulFunctions.current_trial == 15)
-        {
-            gems_panel.SetActive(false);
-            gems_collect.SetActive(false);
-            feedbackMenu.SetActive(false);
-            startTrialMenu.SetActive(false);
-
-        }
         else
         {
             startTrialMenu.SetActive(false);
             feedbackMenu.SetActive(true);
-            gems_panel.SetActive(false);
-            gems_collect.SetActive(false);
         }
 
     }
@@ -70,7 +62,7 @@ public class Feedback : MonoBehaviour
                 score_t = "0";
             }
 
-            if (d < 25 && d >= 0)
+            if (d < 25)
             {
                 treasureFull.SetActive(true);
                 score_ui = int.Parse(score_t);
@@ -94,7 +86,7 @@ public class Feedback : MonoBehaviour
                 PlayerPrefs.SetString("Score", tot_score.ToString());
                 Demo.feedbackInfo.color = "Yellow";
             }
-            else if (d >= 100)
+            else if (d >= 75)
             {
                 treasureEmpty.SetActive(true);
                 score_ui = int.Parse(score_t);
@@ -107,18 +99,46 @@ public class Feedback : MonoBehaviour
                 Demo.feedbackInfo.color = "Red";
             }
         }
+        Debug.Log("Distance: " + d);
         EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(GameObject.FindGameObjectWithTag("FeedbackContinue"));
     }
     
 
     public void onQuitClick()
     {
-        Application.LoadLevel(7);
+        string _data, _FileLocation;
+        _FileLocation = Application.dataPath + "/SubTrialInfo";
+        //End experiment
+        try
+        {
+            _data = UsefulFunctions.SerializeObject(Demo.trialFeedback);
+            UsefulFunctions.CreateXML(_FileLocation, _data);
+            Debug.Log("Feedback data Saved");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError(ex.ToString());
+        }
+        Application.LoadLevel(6);
     }
 
     public void onContinueClick()
     {
-        UsefulFunctions.RndEnvironment();
+        if (UsefulFunctions.current_trial == 30)
+            halfWayThroughIt = true;
+
+        if(halfWayThroughIt)
+        {
+            treasureEmpty.SetActive(false);
+            treasureFull.SetActive(false);
+            treasureMedium.SetActive(false);
+            feedback_text.text = "Good job pirate! You're half way through it." + Environment.NewLine + "Would you like to take a break?" + Environment.NewLine + "Press continue when you're ready.";
+            halfWayThroughIt = false;
+        }
+        else
+        {
+            UsefulFunctions.RndEnvironment();
+        }
     }
 
 }

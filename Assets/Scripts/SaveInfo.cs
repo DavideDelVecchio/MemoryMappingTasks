@@ -4,9 +4,8 @@ using System.Collections;
 
 public class SaveInfo : MonoBehaviour {
     public GameObject sbj,save;
-    public Toggle oculus;
+    public Toggle mapping;
     public InputField sbjname;
-    public Dropdown env_order;
     public int level = 0;
 
     //Levels:
@@ -29,21 +28,27 @@ public class SaveInfo : MonoBehaviour {
 
     public void OnClick() {
         PlayerPrefs.SetString("SubjID", sbjname.text);
-        if (oculus.isOn)
+        if (mapping.isOn)
         {
-            PlayerPrefs.SetInt("Oculus", 1); //Exp with Oculus
+            PlayerPrefs.SetInt("isMapping", 1); //Mapping task
         }
         else {
-            PlayerPrefs.SetInt("Oculus", 0); //Exp without Oculus
+            PlayerPrefs.SetInt("isMapping", 0); //Path Integration
         }
 
-        PlayerPrefs.SetInt("EnvOrder", env_order.value);
         PlayerPrefs.SetString("Score", "0");
-        UsefulFunctions.env1 = 0;
-        UsefulFunctions.env2 = 0;
-        UsefulFunctions.env3 = 0;
+        ResetEnvVariables();
         Application.LoadLevel(4);
     }
 
+
+
+    public void ResetEnvVariables()
+    {
+        UsefulFunctions.env1 = 0;
+        UsefulFunctions.env2 = 0;
+        UsefulFunctions.env3 = 0;
+        UsefulFunctions.endBlock = false;
+    }
 
 }
