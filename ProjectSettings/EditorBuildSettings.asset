@@ -19,3 +19,5 @@ EditorBuildSettings:
     path: Assets/Scenes/Feedback.unity
   - enabled: 1
     path: Assets/Scenes/End.unity
+  - enabled: 1
+    path: Assets/Scenes/LeaderboardUI.unity

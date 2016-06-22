@@ -11,14 +11,24 @@ using System.Collections;
 public class UsefulFunctions : MonoBehaviour {
     public static GameObject[] gems,totems,invisibleBorders,islandItems,palms,woods,waves,fence;
     public static GameObject treasure;
+    public static string level1, level2, level3;
     public static List<Vector3> envItems = new List<Vector3>();
-    public static int current_gem_number, previous_gem_number;
+    public static int current_gem_number;
     public static int tot_trials = 60;
     public static int old_trial, current_trial = 0;
-    public static int env1, env2, env3 = 0;
-    public static bool sameTrial, endBlock = false;
+    public static int env1, env2, env3 = 1;
+    public static int changeMusic= 0;
+    public static int skyIndex = -1;
+    public static bool sameTrial, endBlock, changeSky, isDisorientation, isShorterVersion = false;
+    public static List<int> alreadyUsedSky = new List<int>();
     public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
     public static CompletePath.PathMapping objPath;// = new PlayerInfo.PathMapping();
+
+    const float X = 0.9f;
+    const float Z = -10.0f;
+    public static Vector3 old_PT_pos, old_gem_pos;
+    public static int old_gem_index = -1;
+
     
 
     //Main Trial information saving
@@ -31,6 +41,9 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_x = obj.transform.position.x;
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
+            info.r_x = obj.transform.rotation.x;
+            info.r_y = obj.transform.rotation.y;
+            info.r_z = obj.transform.rotation.z;
             info.time = Demo.trial_t;
             info.score = PlayerPrefs.GetString("Score");
             Demo.trialInfo.Add(info);
@@ -39,6 +52,9 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_x = treasure.transform.position.x;
             info.s_y = treasure.transform.position.y;
             info.s_z = treasure.transform.position.z;
+            info.r_x = treasure.transform.rotation.x;
+            info.r_y = treasure.transform.rotation.y;
+            info.r_z = treasure.transform.rotation.z;
             info.time = Demo.trial_t;
             info.score = PlayerPrefs.GetString("Score");
             Demo.trialInfo.Add(info);
@@ -62,6 +78,9 @@ public class UsefulFunctions : MonoBehaviour {
             info.s_x = obj.transform.position.x;
             info.s_y = obj.transform.position.y;
             info.s_z = obj.transform.position.z;
+            info.r_x = obj.transform.rotation.x;
+            info.r_y = obj.transform.rotation.y;
+            info.r_z = obj.transform.rotation.z;
             info.time = Demo.trial_t;
             info.score = PlayerPrefs.GetString("Score");
             info.d = Vector3.Distance(Demo.goal_position, Demo.last_position);
@@ -185,6 +204,7 @@ public class UsefulFunctions : MonoBehaviour {
         if (tag == "Gems")
         {
             envItems.Add(GameObject.FindGameObjectWithTag("Player").transform.position);
+            envItems.Add(treasure.transform.position);
         }
         //Calculates new position
         while (checkPosition)
@@ -222,10 +242,16 @@ public class UsefulFunctions : MonoBehaviour {
                 }
             }
             check_prev_pos = Vector3.Distance(newPositionP, Demo.goal_position);
-            Debug.Log("Player Pos Distance: " + check_prev_pos);
             if (tag == "Player" && check_prev_pos < 100)
             {
                 checkPosition = true;
+            }
+            else if(tag == "Gems")
+            {
+                float dist_treas = Vector3.Distance(treasure.transform.position, newPositionP);
+                float dist_play = Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, newPositionP);
+                if(dist_treas < 150 || dist_play < 150 || (dist_play <150 && dist_treas < 150))
+                    checkPosition = true;
             }
         }
     }
@@ -248,14 +274,6 @@ public class UsefulFunctions : MonoBehaviour {
     //Randomize the environment
     public static void RndEnvironment()
     {
-        //Possible environmental order
-        //0: Distal Cues, Distal Cues and Boundaries, Distal Cues and Landmarks 1 2 3
-        //1: Distal Cues, Distal Cues and Landmarks, Distal Cues and Boundaries 1 3 2
-        //2: Distal Cues and Boundaries, Distal Cues, Distal Cues and Landmarks 2 1 3
-        //3: Distal Cues and Boundaries, Distal Cues and Landmarks, Distal Cues 2 3 1
-        //4: Distal Cues and Landmarks, Distal Cues and Boundaries, Distal Cues 3 2 1
-        //5: Distal Cues and Landmarks, Distal Cues, Distal cues and Boundaries 3 1 2
-
         //Checks the experimental status and ends it if necessary 
         CheckExpStatus();
         int env;
@@ -270,87 +288,72 @@ public class UsefulFunctions : MonoBehaviour {
         else
         {
             env = 3;
+            changeMusic = 3;
         }
 
         switch (env)
         {
             case 1:
-                if(env1<=20)
+                if(env1<20)
                 {
-                    if(env1 == 10)
+                    if(env1<8)
                     {
-                        if(previous_gem_number == 1)
-                        {
-                            current_gem_number = previous_gem_number = 2;
-
-                        }
-                        else
-                        {
-                            current_gem_number = previous_gem_number = 1;
-                        }
+                        current_gem_number = 1;
                     }
                     else
                     {
-                        current_gem_number = previous_gem_number;
+                        current_gem_number = 2;
                     }
                     env1++;
-                    Application.LoadLevel(1);
+                    Debug.Log(env1);
+                    changeMusic = 1;
+                    Application.LoadLevel(level1);
                 }
                 else
                 {
                     endBlock = true;
-                    Application.LoadLevel(5);
+                    //changeSky = true;
+                    current_gem_number = 1;
+                    changeMusic = 2;
+                    Application.LoadLevel(level2);
                 }
                 break;
             case 2:
-                if (env2 <= 20)
+                if (env2 < 20)
                 {
-                    if (env2 == 10)
+                    if (env2 < 8)
                     {
-                        if (previous_gem_number == 1)
-                        {
-                            current_gem_number = previous_gem_number = 2;
-
-                        }
-                        else
-                        {
-                            current_gem_number = previous_gem_number = 1;
-                        }
+                        current_gem_number = 1;
                     }
                     else
                     {
-                        current_gem_number = previous_gem_number;
+                        current_gem_number = 2;
                     }
                     env2++;
-                    Application.LoadLevel(2);
+                    Debug.Log(env2);   
+                    Application.LoadLevel(level2);
                 }
                 else
                 {
                     endBlock = true;
-                    Application.LoadLevel(5);
+                    current_gem_number = 1;
+                    Application.LoadLevel(level3);
                 }
                 break;
             case 3:
-                if (env3 <= 20)
+                if (env3 < 20)
                 {
-                    if (env3 == 10)
+                    if (env3 < 8)
                     {
-                        if (previous_gem_number == 1)
-                        {
-                            current_gem_number = previous_gem_number = 2;
-
-                        }
-                        else
-                        {
-                            current_gem_number = previous_gem_number = 1;
-                        }
+                        current_gem_number = 1;
                     }
                     else
                     {
-                        current_gem_number = previous_gem_number;
+                        current_gem_number = 2;
                     }
                     env3++;
-                    Application.LoadLevel(3);
+                    Debug.Log(env3);
+                    Application.LoadLevel(level3);
                 }
                 else
                 {
@@ -386,18 +389,22 @@ public class UsefulFunctions : MonoBehaviour {
     public static bool OnButtonPression()
     {
         bool check = false;
-        if (GameObject.FindGameObjectWithTag("Player") != null)
+
+        if (SystemInfo.operatingSystem.Contains("Windows"))
         {
             //Allows input from Xbox360 controller, generic controller and Mac users
-            if (Input.GetButton("A") || Input.GetButton("OtherX") || Input.GetButton("MacX"))
+            if (Input.GetButton("A"))
             {
                 check = true;
             }
         }
-        else {
-            check = false;
+        else
+        {
+            if(Input.GetButton("MacX"))
+            {
+                check = true;
+            }
         }
-
         return check;
     }
 
@@ -405,20 +412,205 @@ public class UsefulFunctions : MonoBehaviour {
     public static bool isGamePaused()
     {
         bool check = false;
-
-        if (GameObject.FindGameObjectWithTag("Player") != null)
+        if (SystemInfo.operatingSystem.Contains("Windows"))
         {
             //Allows input from Xbox360 controller, generic controller and Mac users
-            if (Input.GetButton("BackButton") || Input.GetButton("BackButtonMac") || Input.GetButton("GenericBackButton"))
+            if (Input.GetButton("BackButton"))
             {
                 check = true;
             }
         }
-        else {
-            check = false;
+        else
+        {
+            if (Input.GetButton("BackButtonMac"))
+            {
+                check = true;
+            }
         }
         return check;
     }
+
+    public static int SetSkyIndex(int oldIndex)
+    {
+        Debug.Log(oldIndex);
+        int result;
+        if(oldIndex == -1)
+        {
+            result = Random.Range(0, 3);
+            skyIndex = result;
+            alreadyUsedSky.Add(result);
+        }
+        else
+        {
+            result = oldIndex;
+            do
+            {
+                result = Random.Range(0, 3);
+            } while (oldIndex == result || alreadyUsedSky.Contains(result));
+            skyIndex = result;
+        }
+        Debug.Log("Sky index: " + result);
+        return result;
+    }
+
+    public static Vector3 RandomizingGameObject(GameObject obj)
+    {
+        Vector3 tempPos = new Vector3();
+        bool continueRandomization = true;
+        int ud = Random.Range(0, 2);
+        float x, z;
+
+        if(obj.tag == "Player")
+        {
+            treasure = GameObject.FindGameObjectWithTag("Treasure");
+            //If it's the first trial
+            if (old_PT_pos == null)
+            {
+                if(ud == 0)
+                {
+                    z = Random.Range(600f, 656f);
+                }
+                else
+                {
+                    z = Random.Range(745f, 801f);
+                }
+                //Player new position
+                tempPos = new Vector3(Random.Range(400f, 701f), obj.transform.position.y, z);
+                obj.transform.position = tempPos;
+                //Update treasure position
+                treasure.transform.position = new Vector3(tempPos.x + X, treasure.transform.position.y, tempPos.z + Z);
+                //Saves this last position for further checks
+                old_PT_pos = tempPos;
+            }
+            //If we already randomize player and treasure pos
+            else
+            {
+                while(continueRandomization)
+                {
+                    if (ud == 0)
+                    {
+                        z = Random.Range(600f, 656f);
+                    }
+                    else
+                    {
+                        z = Random.Range(745f, 801f);
+                    }
+                    //Player new position
+                    tempPos = new Vector3(Random.Range(400f, 701f), obj.transform.position.y, z);
+                    if (Vector3.Distance(tempPos, old_PT_pos) > 100f)
+                    {
+                        old_PT_pos = tempPos;
+                        obj.transform.position = tempPos;
+                        //Update treasure position
+                        if (treasure != null)
+                        {
+                            treasure.transform.position = new Vector3(tempPos.x + X, treasure.transform.position.y, tempPos.z + Z);
+                        }
+                        continueRandomization = false;
+                    }
+                }
+            }
+        }
+        else if (obj.tag == "Gems")
+        {
+            if(old_gem_pos == null)
+            {
+                if (ud == 0)
+                {
+                    z = Random.Range(600f, 656f);
+                }
+                else
+                {
+                    z = Random.Range(745f, 801f);
+                }
+                //Gem new position
+                tempPos = new Vector3(Random.Range(400f, 701f), obj.transform.position.y, z);
+                obj.transform.position = tempPos;
+                //Saves this last position for further checks
+                old_PT_pos = tempPos;
+            }
+            else
+            {
+                while(continueRandomization)
+                {
+                    if (ud == 0)
+                    {
+                        z = Random.Range(600f, 656f);
+                    }
+                    else
+                    {
+                        z = Random.Range(745f, 801f);
+                    }
+                    //Gem new position
+                    tempPos = new Vector3(Random.Range(400f, 701f), obj.transform.position.y, z);
+                    if(Vector3.Distance(tempPos,old_gem_pos) > 100f && Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position,tempPos) > 100f)
+                    {
+                        old_gem_pos = tempPos;
+                        obj.transform.position = tempPos;
+                        continueRandomization = false;
+                    }
+                }
+            }
+        }
+        return tempPos;
+    }
+
+    public static GameObject RandomizeGem(GameObject[] gems)
+    {
+        GameObject choosenGem;
+        int i;
+        do
+        {
+            i = Random.Range(0, gems.Length);
+        } while (i == old_gem_index);
+        choosenGem = gems[i];
+        old_gem_index = i;
+        foreach (GameObject g in gems)
+        {
+            if (g == gems[i])
+                g.SetActive(true);
+            else
+                g.SetActive(false);
+        }
+        if(!isShorterVersion)
+            RndPositionObj(choosenGem);
+
+        return choosenGem;
+    }
+
+    public static Vector3 MappingRandomize(GameObject player)
+    {
+        Vector3 tempPos = new Vector3();
+        Vector3 prev_player_pos;
+        bool continueRandomization = true;
+        int ud = Random.Range(0, 2);
+        float x, z;
+
+        //Saves actual position
+        prev_player_pos = player.transform.position;
+        //Randomize position
+        while (continueRandomization)
+        {
+            if (ud == 0)
+            {
+                z = Random.Range(600f, 656f);
+            }
+            else
+            {
+                z = Random.Range(745f, 801f);
+            }
+            //Player new position
+            tempPos = new Vector3(Random.Range(400f, 701f), player.transform.position.y, z);
+            if (Vector3.Distance(tempPos, old_PT_pos) > 100f && Vector3.Distance(tempPos, prev_player_pos) > 100f)
+            {
+                old_PT_pos = tempPos;
+                player.transform.position = tempPos;
+                continueRandomization = false;
+            }
+        }
+        return tempPos;
+    }
+
 
     //Save info into XML files
     /* The following metods came from the referenced URL */

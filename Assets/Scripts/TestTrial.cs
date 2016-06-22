@@ -7,11 +7,11 @@ using System.Linq;
 public class TestTrial : MonoBehaviour
 {
 
-    public GameObject player, oculus_player, treasure, instruction_menu, feedbackEndTrial,tornadoFeedback, tornado;
+    public GameObject player, treasure, instruction_menu, feedbackEndTrial,tornadoFeedback, tornado;
     public GameObject[] tornados,gems;
     int menu_score, score_ui;
     int score, dummy = 0;
-    bool showFeedback, tilted,startRot = false;
+    bool showFeedback, tilted,startRot,checkForButton = false;
     float time_anim;
     public Text score_gained, gems_info;
     public static GameObject collectObj;
@@ -29,12 +29,13 @@ public class TestTrial : MonoBehaviour
         player.GetComponent<MouseLook>().enabled = false;
         Debug.Log("Activate player prefab");
         //Randomize gem position and assign it to the variable
-        collectObj = UsefulFunctions.ChooseGem(gems);
+        //collectObj = UsefulFunctions.ChooseGem(gems);
         //Randomize Player and Treasure position
-        UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
+        //UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
+        player.transform.position = UsefulFunctions.RandomizingGameObject(player);
+        collectObj = UsefulFunctions.RandomizeGem(gems);
         //Randomize number of collectable obj
         menu_score = 2;
-        UsefulFunctions.previous_gem_number = 2;
         //Update score and gems UI
         gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
         score_gained.text = "0";
@@ -47,14 +48,14 @@ public class TestTrial : MonoBehaviour
     {
         //Show exp instructions
         instruction_menu.SetActive(true);
-
+        BackgroundMusicController.singleton.onSwitchPression(UsefulFunctions.changeMusic);
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         trial_t += Time.deltaTime; //updates time
-        if (score == menu_score)
+        if (score == menu_score && checkForButton)
         {
             if(time_anim == (trial_t + 5))
             {
@@ -65,6 +66,7 @@ public class TestTrial : MonoBehaviour
             if (UsefulFunctions.OnButtonPression() == true)
             {
                 score_text = score_gained.text;
+                UsefulFunctions.SetSkyIndex(UsefulFunctions.skyIndex);
                 Application.LoadLevel(5); //Feedback level
             }
         }
@@ -85,6 +87,21 @@ public class TestTrial : MonoBehaviour
             player.GetComponent<Animator>().enabled = false;
             startRot = false;
         }
+
+        /*if (Input.GetButton("Y"))
+             UsefulFunctions.RndEnvironment();
+         
+         if (Input.GetButton("Y"))
+             collectObj = UsefulFunctions.RandomizeGem(gems);
+
+         if (Input.GetButton("X"))
+             player.transform.position = UsefulFunctions.RandomizingGameObject(player);
+
+         if (Input.GetButton("Y"))
+         {
+             int index = UsefulFunctions.SetSkyIndex(UsefulFunctions.skyIndex);
+             Camera.main.GetComponent<Skybox>().material = skies[index];
+         }*/
     }
 
     //Object collision
@@ -98,7 +115,8 @@ public class TestTrial : MonoBehaviour
         collectObj.SetActive(false);
         if (score != menu_score)
         {
-            collectObj = UsefulFunctions.ChooseGem(gems);
+            //collectObj = UsefulFunctions.RandomizeGem(gems);
+            collectObj = UsefulFunctions.RandomizeGem(gems);
         }
         else
         {
@@ -109,12 +127,13 @@ public class TestTrial : MonoBehaviour
                 foreach (GameObject g in tornados)
                     g.SetActive(true);
                 tornadoFeedback.SetActive(true);
-                StartCoroutine(WaitForIt(5f));
+                StartCoroutine(WaitForIt(3.5f));
             }
             else
             {
                 feedbackEndTrial.SetActive(true);
                 showFeedback = true;
+                checkForButton = true;
             }
         }
     }
@@ -123,7 +142,9 @@ public class TestTrial : MonoBehaviour
     {
         Debug.Log("Waiting START..." + Time.time);
         yield return new WaitForSeconds(seconds);
-        UsefulFunctions.RndPositionObj(player);
+        //UsefulFunctions.RndPositionObj(player);
+        //player.transform.position = UsefulFunctions.MappingRandomize(player); NOT WORKING
+        UsefulFunctions.RandomizingGameObject(player);
         Debug.Log("Waiting END..." + Time.time);
         tornadoFeedback.SetActive(false);
         tornado.SetActive(false);
@@ -134,6 +155,7 @@ public class TestTrial : MonoBehaviour
         feedbackEndTrial.SetActive(true);
         showFeedback = true;
         player.GetComponent<CharacterController>().enabled = true;
+        checkForButton = true;
     }
 
 }

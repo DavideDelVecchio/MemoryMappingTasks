@@ -15,6 +15,9 @@ public class MainTrialInfo : ISerializable
         public float s_x;
         public float s_y;
         public float s_z;
+        public float r_x;
+        public float r_y;
+        public float r_z;
         public float time;
         public float d;
         public string score;
@@ -24,6 +27,9 @@ public class MainTrialInfo : ISerializable
             s_x = 0;
             s_y = 0;
             s_z = 0;
+            r_x = 0;
+            r_y = 0;
+            r_z = 0;
             time = 0;
             d = 0;
             score = "0";
@@ -36,6 +42,9 @@ public class MainTrialInfo : ISerializable
             info.AddValue("posx", s_x);
             info.AddValue("posy", s_y);
             info.AddValue("posz", s_z);
+            info.AddValue("rotx", r_x);
+            info.AddValue("roty", r_y);
+            info.AddValue("rotz", r_z);
             info.AddValue("time", time);
             info.AddValue("distance", d);
             info.AddValue("score", score);

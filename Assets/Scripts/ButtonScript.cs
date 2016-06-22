@@ -6,70 +6,65 @@ using System.Collections;
 public class ButtonScript : MonoBehaviour {
     public static int pageIndex = 0;
     public int dummy = 0;
-    public GameObject page0,page1, page2,page3,page4,page5,page6,next,start,menu;
+    public GameObject menu; //page0,page1, page2,page3,page4,page5,page6,page7,next,start,
+    public GameObject[] pages;
     public string _FileLocation, _data;
+    public bool hasStartedInstructions = false;
     bool isSaving;
 
-    public void NextPage()
+    void Start()
     {
-        switch (pageIndex)
+        if (!hasStartedInstructions)
         {
-            case 0:
-                page0.SetActive(false);
-                page1.SetActive(true);
-                pageIndex++;
-                break;
-            case 1:
-                page1.SetActive(false);
-                page2.SetActive(true);
-                pageIndex++;
-                break;
-            case 2:
-                page2.SetActive(false);
-                page3.SetActive(true);
-                pageIndex++;
-                break;
-            case 3:
-                page3.SetActive(false);
-                page4.SetActive(true);
-                pageIndex++;
-                break;
-            case 4:
-                page4.SetActive(false);
-                page5.SetActive(true);
-                pageIndex++;
-                break;
-            case 5:
-                page5.SetActive(false);
-                page6.SetActive(true);
-                next.SetActive(false);
-                start.SetActive(true);
-                EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(start);
-                pageIndex++;
-                break;
+            hasStartedInstructions = true; //we want to make sure we only start the instruction coroutine *once*
+            StartCoroutine(DisplayInstructions()); //starts the instruction coroutine!
         }
     }
 
-    public void StartDemo()
+    //DisplayInstructions coroutine!
+    public IEnumerator DisplayInstructions()
     {
-        if (pageIndex == 6)
+        yield return StartCoroutine(WaitForActionButton());
+        if (pageIndex == 0)
         {
-            menu.SetActive(false);
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player == null)
+            pages[pageIndex].SetActive(false);
+
+            while (pageIndex < 7)
             {
-                player = GameObject.FindGameObjectWithTag("OculusPlayer");
-                player.GetComponent<OVRGamepadController>().enabled = true;
-                player.GetComponent<OVRPlayerController>().enabled = true;
+                pages[pageIndex].SetActive(false);
+                pages[pageIndex + 1].SetActive(true);
+                pageIndex++;
+                yield return StartCoroutine(WaitForActionButton());
             }
-            else
+            if(pageIndex == 7)
             {
+                menu.SetActive(false);
+                GameObject player = GameObject.FindGameObjectWithTag("Player");
                 player.GetComponent<CharacterController>().enabled = true;
                 player.GetComponent<MouseLook>().enabled = true;
+                GameObject treasure = GameObject.FindGameObjectWithTag("Treasure");
+                treasure.GetComponent<Animator>().enabled = true;
             }
         }
-        GameObject treasure = GameObject.FindGameObjectWithTag("Treasure");
-        treasure.GetComponent<Animator>().enabled = true;
+    }
+
+    //WaitForActionButton coroutine!
+    public IEnumerator WaitForActionButton()
+    {
+        bool hasPressedButton = false;
+        while (Input.GetAxis("A") != 0f)
+        { //wait for the button to be released if it was pushed down
+            yield return 0; //waits a frame each time until button is released so that we don't get stuck
+        }
+        while (!hasPressedButton)
+        { //now wait for the button to be pushed again
+            if (Input.GetAxis("A") == 1.0f )
+            {
+                hasPressedButton = true;
+            }
+            yield return 0; //waits a frame so that we don't get stuck
+        }
+        //once we reach the end of the function, the button has been successfully pressed!
     }
 
     public void ContinueExp()
@@ -79,14 +74,7 @@ public class ButtonScript : MonoBehaviour {
 
     public void QuitExp()
     {
-
         Application.LoadLevel(6);
-    }
-
-    public void ResumeButton()
-    {
-        Time.timeScale = 1;
-        Demo.trial_t = Demo.pause_t;
     }
 
 

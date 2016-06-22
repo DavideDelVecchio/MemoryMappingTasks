@@ -12,10 +12,12 @@ public class Demo : MonoBehaviour {
     int dummy = 0;
     public static int score = 0;
     string _FileLocation, _data, subName;
-    bool isSaving, startTrial,showFeedback,tilted,startRot,isPaused;
+    bool isSaving, startTrial,showFeedback,tilted,startRot,isPaused,checkForButton;
     public Text score_gained, gems_info;
+    public Material[] skies; 
     public static GameObject collectObj, pmenu;
     public static Vector3 goal_position, last_position;
+    public static Quaternion goal_rotation, last_rotation;
     public static float pause_t, trial_t, collision_t, distance = 0.0f;
     public static string _FileName, score_text = "";
     public static DistanceAndFeedBack.FeedbackInfo feedbackInfo;
@@ -39,13 +41,14 @@ public class Demo : MonoBehaviour {
         player.GetComponent<MouseLook>().enabled = false;
         Debug.Log("Activate player prefab");
         //Randomize gem position and assign it to the variable
-        collectObj = UsefulFunctions.ChooseGem(gems);
+        //collectObj = UsefulFunctions.ChooseGem(gems);
         //Randomize Player and Treasure position
-        UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
+        //UsefulFunctions.RndPositionObj(player); //Randomize player and treasure chest position
+        player.transform.position = UsefulFunctions.RandomizingGameObject(player);
+        collectObj = UsefulFunctions.RandomizeGem(gems);
         UsefulFunctions.MainInfoSaving(player); //Saves player and treasure position
         //Randomize number of collectable obj
         menu_score = UsefulFunctions.current_gem_number;
-        UsefulFunctions.previous_gem_number = menu_score;
         //Update score and gems UI
         gems_info.text = "GEMS: " + score.ToString() + "/" + menu_score.ToString();
         if (UsefulFunctions.current_trial == 0 || UsefulFunctions.current_trial == 1)
@@ -59,7 +62,23 @@ public class Demo : MonoBehaviour {
         showFeedback = false;
         tilted = false;
         startRot = false;
+        checkForButton = false;
         feedbackEndTrial.SetActive(false);
+        if (UsefulFunctions.changeSky)
+        {
+            if (Camera.main != null)
+            {
+                int index = UsefulFunctions.SetSkyIndex(UsefulFunctions.skyIndex);
+                Camera.main.GetComponent<Skybox>().material = skies[index];
+                UsefulFunctions.changeSky = false;
+            }
+        }
+        else
+        {
+            if(UsefulFunctions.skyIndex != - 1)
+                Camera.main.GetComponent<Skybox>().material = skies[UsefulFunctions.skyIndex];
+        }
+
     }
 
     // Use this for initialization
@@ -69,6 +88,8 @@ public class Demo : MonoBehaviour {
         _FileLocation = Application.dataPath + "/SubTrialInfo";
         //Saves the treasure position
         goal_position = treasure.transform.position;
+        goal_rotation = treasure.transform.rotation;
+        BackgroundMusicController.singleton.onSwitchPression(UsefulFunctions.changeMusic);
     }
 	
 	// Update is called once per frame
@@ -85,7 +106,7 @@ public class Demo : MonoBehaviour {
             player.GetComponent<MouseLook>().enabled = false;
         }
         UsefulFunctions.PathTracing(player);
-        if (score == menu_score)
+        if (score == menu_score && checkForButton)
         {
             feedbackEndTrial.GetComponent<Animator>().SetBool("hasToGoBack", showFeedback);
             if (UsefulFunctions.OnButtonPression() == true)
@@ -93,6 +114,7 @@ public class Demo : MonoBehaviour {
                 score_text = score_gained.text;
                 UsefulFunctions.MainInfoSaving(player); //Saves last position
                 last_position = player.transform.position;
+                last_rotation = player.transform.rotation;
                 distance = Vector3.Distance(goal_position, last_position);
                 //Saves all variables in files
                 try
@@ -134,6 +156,10 @@ public class Demo : MonoBehaviour {
             player.GetComponent<Animator>().enabled = false;
             startRot = false;
         }
+
+
+        /*if (Input.GetButton("Y"))
+            UsefulFunctions.RndEnvironment();*/
     }
 
     //Object collision
@@ -148,7 +174,8 @@ public class Demo : MonoBehaviour {
         collectObj.SetActive(false);
         if (score != menu_score)
         {
-            collectObj = UsefulFunctions.ChooseGem(gems);
+            //collectObj = UsefulFunctions.ChooseGem(gems);
+            collectObj = UsefulFunctions.RandomizeGem(gems);
         }
         else
         {
@@ -159,12 +186,13 @@ public class Demo : MonoBehaviour {
                 foreach (GameObject g in tornados)
                     g.SetActive(true);
                 tornadoFeedback.SetActive(true);
-                StartCoroutine(WaitForIt(5f));
+                StartCoroutine(WaitForIt(3.5f));
             }
             else
             {
                 feedbackEndTrial.SetActive(true);
                 showFeedback = true;
+                checkForButton = true;
             }
         }
     }
@@ -187,7 +215,9 @@ public class Demo : MonoBehaviour {
     {
         Debug.Log("Waiting START..." + Time.time);
         yield return new WaitForSeconds(seconds);
-        UsefulFunctions.RndPositionObj(player);
+        //UsefulFunctions.RndPositionObj(player);
+        //player.transform.position = UsefulFunctions.MappingRandomize(player); NOT WORKING
+        UsefulFunctions.RandomizingGameObject(player);
         Debug.Log("Waiting END..." + Time.time);
         tornadoFeedback.SetActive(false);
         tornado.SetActive(false);
@@ -198,6 +228,7 @@ public class Demo : MonoBehaviour {
         feedbackEndTrial.SetActive(true);
         showFeedback = true;
         player.GetComponent<CharacterController>().enabled = true;
+        checkForButton = true;
     }
 
 }
