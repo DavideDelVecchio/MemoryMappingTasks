@@ -6,6 +6,8 @@ public class TestRandomPos : MonoBehaviour {
     public Vector3 initialPos,lastPosition;
     public bool continueRandomizing = true;
     public float distance;
+    public Transform playerTransform;
+    public Transform cameraTransform;
 
 
     void Awake()
@@ -33,8 +35,13 @@ public class TestRandomPos : MonoBehaviour {
         //    }
         //}
         //continueRandomizing = true;
-        this.transform.position = ShorterFunctions.RandomizeGem();
-	}
+        //ShorterFunctions.RandomizeGemPosition(this.gameObject);
+        //playerTransform.rotation = Quaternion.Euler(ShorterFunctions.rotVectorPlayer);
+        //playerTransform.localEulerAngles = ShorterFunctions.rotVectorPlayer;
+        //cameraTransform.rotation = ShorterFunctions.rotValuePlayer;
+        //cameraTransform.localEulerAngles = ShorterFunctions.rotVectorPlayer;
+        cameraTransform.rotation = Quaternion.Euler(ShorterFunctions.rotVectorPlayer);
+    }
 
 
 }

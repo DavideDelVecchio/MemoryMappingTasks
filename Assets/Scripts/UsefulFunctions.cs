@@ -357,7 +357,7 @@ public class UsefulFunctions : MonoBehaviour {
                 }
                 else
                 {
-                    Application.LoadLevel(6); //End Scene
+                    Application.LoadLevel("End"); //End Scene
                 }
                 break;
         }

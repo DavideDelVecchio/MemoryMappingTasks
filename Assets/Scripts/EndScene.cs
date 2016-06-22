@@ -15,7 +15,7 @@ public class EndScene : MonoBehaviour {
     {
         StartCoroutine(CheckingConnection());
 
-        if(isConnected)
+        if(isConnected && !UsefulFunctions.isShorterVersion)
         {
             quit.SetActive(false);
             //Post subject and score on the leaderboard based on the task

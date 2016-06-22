@@ -67,7 +67,15 @@ public class TestTrial : MonoBehaviour
             {
                 score_text = score_gained.text;
                 UsefulFunctions.SetSkyIndex(UsefulFunctions.skyIndex);
-                Application.LoadLevel(5); //Feedback level
+                if(!UsefulFunctions.isShorterVersion)
+                {
+                    Application.LoadLevel("Feedback"); //Feedback level
+                }
+                else
+                {
+                    Application.LoadLevel("FeedbackShorter"); //Feedback level
+                }
+                
             }
         }
         if (treasure.GetComponent<Animator>().isActiveAndEnabled)

@@ -52,17 +52,11 @@
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Advertisements">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Advertisements.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Analytics">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
@@ -99,6 +93,7 @@
     <Compile Include="Assets\Scripts\DistanceAndFeedBack.cs" />
     <Compile Include="Assets\Scripts\EndScene.cs" />
     <Compile Include="Assets\Scripts\Feedback.cs" />
+    <Compile Include="Assets\Scripts\FeedbackShorter.cs" />
     <Compile Include="Assets\Scripts\LeaderboardElement.cs" />
     <Compile Include="Assets\Scripts\LeaderboardManager.cs" />
     <Compile Include="Assets\Scripts\MainTrialInfo.cs" />
@@ -107,6 +102,7 @@
     <Compile Include="Assets\Scripts\MouseLook.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\SaveInfo.cs" />
+    <Compile Include="Assets\Scripts\SaveInfoShorter.cs" />
     <Compile Include="Assets\Scripts\ShorterFunctions.cs" />
     <Compile Include="Assets\Scripts\TestRandomPos.cs" />
     <Compile Include="Assets\Scripts\TestTrial.cs" />
@@ -185,6 +181,22 @@
     <None Include="Assets\Island pack\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\frag_ao.cginc" />
     <None Include="Assets\Model3D\Targets\Gems\Gem\Shaders\Gem.shader" />
     <None Include="Assets\Simple Particle Ribbon\readme_Simple_Particle_Ribbon.txt" />
+    <None Include="Assets\SubTrialInfo\PW190785_CompleteTrialPath_Mapping1.xml" />
+    <None Include="Assets\SubTrialInfo\PW190785_MainTrialInfo_Mapping1.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_CompleteTrialPath_Mapping1.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_CompleteTrialPath_Mapping2.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_CompleteTrialPath_Mapping3.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_CompleteTrialPath_Mapping4.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_MainTrialInfo_Mapping1.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_MainTrialInfo_Mapping2.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_MainTrialInfo_Mapping3.xml" />
+    <None Include="Assets\SubTrialInfo\egeedagaaea_MainTrialInfo_Mapping4.xml" />
+    <None Include="Assets\SubTrialInfo\sdfasdfaweqw_CompleteTrialPath_Mapping1.xml" />
+    <None Include="Assets\SubTrialInfo\sdfasdfaweqw_CompleteTrialPath_Mapping2.xml" />
+    <None Include="Assets\SubTrialInfo\sdfasdfaweqw_CompleteTrialPath_Mapping3.xml" />
+    <None Include="Assets\SubTrialInfo\sdfasdfaweqw_MainTrialInfo_Mapping1.xml" />
+    <None Include="Assets\SubTrialInfo\sdfasdfaweqw_MainTrialInfo_Mapping2.xml" />
+    <None Include="Assets\SubTrialInfo\sdfasdfaweqw_MainTrialInfo_Mapping3.xml" />
     <None Include="Assets\sky5X\README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
