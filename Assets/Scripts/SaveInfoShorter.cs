@@ -32,7 +32,8 @@ public class SaveInfoShorter : MonoBehaviour {
         PlayerPrefs.SetString("Score", "0");
         ResetEnvVariables();
         DesignSettings(designLevels.value);
-        Application.LoadLevel("TestTrial");
+        ShorterFunctions.reloadDemo = false;
+        Application.LoadLevel("TestTrialShorter");
 
     }
 

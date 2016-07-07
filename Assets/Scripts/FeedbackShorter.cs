@@ -134,20 +134,34 @@ public class FeedbackShorter : MonoBehaviour
 
     public void onContinueClick()
     {
+        bool checkStatus = false;
+        checkStatus = ShorterFunctions.ExpStatus();
 
-
-        if(ShorterFunctions.levelID == 1)
-        {
-            Application.LoadLevel(ShorterFunctions.geometry);
+        if(!checkStatus)
+        { 
+            if(ShorterFunctions.levelID == 1)
+            {
+                Application.LoadLevel(ShorterFunctions.geometry);
+            }
+            else if(ShorterFunctions.levelID == 2)
+            {
+                Application.LoadLevel(ShorterFunctions.distal_geometry);
+            }
         }
-        else if(ShorterFunctions.levelID == 2)
+        else
         {
-            Application.LoadLevel(ShorterFunctions.distal_geometry);
+            Application.LoadLevel("End");
         }
 
     }
 
 
+    public void OnRetryClick()
+    {
+        UsefulFunctions.current_trial = 0;
+        ShorterFunctions.reloadDemo = true;
+        Application.LoadLevel("TestTrialShorter");
+    }
 
 
 }

@@ -102,8 +102,8 @@ public class DemoShorter : MonoBehaviour {
             pmenu = paused_menu;
             pmenu.SetActive(true);
             pause_t = trial_t;
-            //player.GetComponent<CharacterController>().enabled = false;
-            //player.GetComponent<MouseLook>().enabled = false;
+            player.GetComponent<CharacterController>().enabled = false;
+            player.GetComponent<MouseLook>().enabled = false;
         }
         UsefulFunctions.PathTracing(player);
         if (score == menu_score && checkForButton)

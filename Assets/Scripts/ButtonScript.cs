@@ -42,8 +42,8 @@ public class ButtonScript : MonoBehaviour {
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
                 player.GetComponent<CharacterController>().enabled = true;
                 player.GetComponent<MouseLook>().enabled = true;
-                GameObject treasure = GameObject.FindGameObjectWithTag("Treasure");
-                treasure.GetComponent<Animator>().enabled = true;
+                //GameObject treasure = GameObject.FindGameObjectWithTag("Treasure");
+                //treasure.GetComponent<Animator>().enabled = true;
             }
         }
     }

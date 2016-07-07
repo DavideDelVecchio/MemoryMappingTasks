@@ -18,6 +18,7 @@ public class SaveInfo : MonoBehaviour {
    void Awake()
     {
         EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(sbjname.gameObject,null);
+        
     }
 
     void Update()

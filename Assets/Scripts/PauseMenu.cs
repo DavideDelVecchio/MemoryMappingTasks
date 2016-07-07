@@ -39,10 +39,22 @@ public class PauseMenu : MonoBehaviour {
 
     public void ResumeButton()
     {
-        Demo.trial_t = Demo.pause_t;
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        player.GetComponent<CharacterController>().enabled = true;
-        player.GetComponent<MouseLook>().enabled = true;
-        Demo.pmenu.SetActive(false);
+        if(!UsefulFunctions.isShorterVersion)
+        {
+            Demo.trial_t = Demo.pause_t;
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            player.GetComponent<CharacterController>().enabled = true;
+            player.GetComponent<MouseLook>().enabled = true;
+            Demo.pmenu.SetActive(false);
+        }
+        else
+        {
+            DemoShorter.trial_t = DemoShorter.pause_t;
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            player.GetComponent<CharacterController>().enabled = true;
+            player.GetComponent<MouseLook>().enabled = true;
+            DemoShorter.pmenu.SetActive(false);
+        }
+
     }
 }

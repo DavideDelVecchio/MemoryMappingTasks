@@ -13,6 +13,8 @@ public class ShorterFunctions : MonoBehaviour {
     public static int levelCount = 1;
     public static int levelID = -1;
 
+    public static bool isSaving, reloadDemo;
+
     public static string geometry, distal_geometry;
 
     public static MainTrialInfo.InfoTrial info;// = new SubjTrialInfo.InfoTrial();
@@ -76,10 +78,14 @@ public class ShorterFunctions : MonoBehaviour {
         }
     }
 
-    public static void ExpStatus()
+    public static bool ExpStatus()
     {
-        if (levelCount > 11)
+        bool quitApp = false;
+
+        if (levelCount > 10)
         {
+            isSaving = true;
+            quitApp = true;
             string _data, _FileLocation;
             _FileLocation = Application.dataPath + "/SubTrialInfo";
             //End experiment
@@ -93,8 +99,14 @@ public class ShorterFunctions : MonoBehaviour {
             {
                 Debug.LogError(ex.ToString());
             }
-            Application.LoadLevel("End");
+            finally
+            {
+                isSaving = false;
+            }
+            Debug.Log(quitApp);
         }
+        Debug.Log(quitApp);
+        return quitApp;
     }
 
     public static void SaveMainInfo(GameObject obj)

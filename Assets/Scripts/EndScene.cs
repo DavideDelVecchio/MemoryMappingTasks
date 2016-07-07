@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class EndScene : MonoBehaviour {
     public int task, score, subjID;
@@ -41,6 +42,7 @@ public class EndScene : MonoBehaviour {
         {
             pirateFeedback.text = "Thank you for your participation mate!/n Arrrrrivederci!";
             quit.SetActive(true);
+            EventSystem.current.GetComponent<EventSystem>().SetSelectedGameObject(GameObject.FindGameObjectWithTag("FeedbackContinue"));
         }
     }
 
